@@ -1,0 +1,24 @@
+@url = http://localhost:3000
+
+# @name createAccount
+POST {{url}}/clients/create-account
+content-type: application/json
+
+{
+    "email": "test@mail.com",
+    "password": "12345678bB#",
+    "fullName": "Gabriel Ferrari Tarallo Ferraz"
+}
+
+###
+
+@accessToken = {{createAccount.response.body.accessToken}}
+
+# @name createRedirectUrl
+POST {{url}}
+Content-Type: application/json
+Authorization: {{accessToken}}
+
+{
+    "longUrl": "https://www.google.com"
+}
