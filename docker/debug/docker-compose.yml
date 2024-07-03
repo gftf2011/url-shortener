@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  core-db:
+    container_name: mysql_core_db_debug
+    build:
+      context: .
+      dockerfile: ./docker/debug/image/mysql/Dockerfile
+      args:
+        mysql_root_password: ${MYSQL_ROOT_PASSWORD}
+        mysql_database: ${MYSQL_DATABASE}
+        mysql_user: ${MYSQL_USER}
+        mysql_password: ${MYSQL_PASSWORD}
+        mysql_port: ${MYSQL_PORT}
+        mysql_conn: ${MYSQL_CONN}
+    restart: unless-stopped
+    volumes:
+      - core_data:/var/lib/mysql
+    ports:
+      - ${MYSQL_PORT}:3306
+
+  core_db_admin:
+    container_name: phpmyadmin_core_db_debug
+    build:
+      context: .
+      dockerfile: ./docker/debug/image/phpmyadmin/Dockerfile
+      args:
+        mysql_root_password: ${MYSQL_ROOT_PASSWORD}
+        phpmyadmin_port: ${PHPMYADMIN_PORT}
+        phpmyadmin_pma_host: core-db
+        phpmyadmin_pma_port: 3306
+        phpmyadmin_pma_arbitrary: 0
+    restart: unless-stopped
+    depends_on:
+      - core-db
+    ports:
+      - '127.0.0.1:${PHPMYADMIN_PORT}:80'
+
+volumes:
+  core_data:

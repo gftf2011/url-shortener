@@ -1,12 +1,12 @@
 import { Controller, Inject, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { IRedirectUrlService } from './contracts/services';
+import { IShortUrlService } from './contracts/services';
 
 @Controller()
-export class RedirectUrlController {
+export class ShortUrlController {
   constructor(
-    @Inject('IRedirectUrlService')
-    private readonly redirectUrlService: IRedirectUrlService,
+    @Inject('IShortUrlService')
+    private readonly ShortUrlService: IShortUrlService,
   ) {}
 
   @Post()
@@ -15,7 +15,7 @@ export class RedirectUrlController {
     @Res() res: Response,
   ): Promise<Response<any, Record<string, any>>> {
     try {
-      const response = await this.redirectUrlService.create(
+      const response = await this.ShortUrlService.create(
         req.body.longUrl,
         req.headers['clientId'] as string,
       );

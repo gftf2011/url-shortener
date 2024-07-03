@@ -6,22 +6,26 @@ type Props = {
   id: string;
   longUrl: string;
   clientId: string;
+  createdAt: number;
 };
 
 type Value = {
   id: IDValueObject;
   longUrl: URLValueObject;
   clientId: ClientIDValueObject;
+  createdAt: Date;
 };
 
-export type RedirectUrlID = IDValueObject;
+export type ShortUrlID = IDValueObject;
 
-export class RedirectURLEntity extends AggregateRoot {
-  protected override id: RedirectUrlID;
+export class ShortUrlEntity extends AggregateRoot {
+  protected override id: ShortUrlID;
 
   private longUrl: URLValueObject;
 
   private clientId: ClientIDValueObject;
+
+  private createdAt: Date;
 
   private constructor(protected readonly props: Props) {
     super();
@@ -31,6 +35,7 @@ export class RedirectURLEntity extends AggregateRoot {
     );
     this.longUrl = URLValueObject.create(props.longUrl);
     this.clientId = ClientIDValueObject.tryToCreate(props.clientId);
+    this.createdAt = new Date(props.createdAt);
   }
 
   static create({
@@ -41,8 +46,8 @@ export class RedirectURLEntity extends AggregateRoot {
     id: string;
     longUrl: string;
     clientId: string;
-  }): RedirectURLEntity {
-    return new RedirectURLEntity({ id, longUrl, clientId });
+  }): ShortUrlEntity {
+    return new ShortUrlEntity({ id, longUrl, clientId, createdAt: Date.now() });
   }
 
   override getValue(): Value {
@@ -50,6 +55,7 @@ export class RedirectURLEntity extends AggregateRoot {
       id: this.id,
       longUrl: this.longUrl,
       clientId: this.clientId,
+      createdAt: this.createdAt,
     };
   }
 }

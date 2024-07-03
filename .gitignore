@@ -133,3 +133,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Docker Compose
+docker-compose.yml
+!docker/dev/docker-compose.yml
+!docker/debug/docker-compose.yml

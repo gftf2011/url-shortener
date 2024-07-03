@@ -1,20 +1,19 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { RedirectUrlModule } from './redirect-url/redirect-url.module';
+import { ShortUrlModule } from './short-url/short-url.module';
 import { ClientsModule } from './clients/clients.module';
 import { AuthMiddleware } from './clients/middlewares';
-import { RedirectUrlController } from './redirect-url/redirect-url.controller';
-import { config } from './config';
+import { ShortUrlController } from './short-url/short-url.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
-    RedirectUrlModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    ShortUrlModule,
     ClientsModule,
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(RedirectUrlController);
+    consumer.apply(AuthMiddleware).forRoutes(ShortUrlController);
   }
 }

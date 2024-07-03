@@ -3,24 +3,11 @@ import {
   UUIDValueObject,
 } from '../../../domain/value-objects';
 import { ClientEntity, PLAN_TYPES, PlanEntity } from '../../../domain/entities';
-import {
-  IFindClientByEmailRepository,
-  IFindPlanByTierRepository,
-  ISaveClientRepository,
-  IFindByIdClientRepository,
-  IUpdateClientRepository,
-} from '../../../domain/repositories/clients';
+import { IClientRepository } from '../../../domain/repositories/clients';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class FakeInMemoryClientsRepository
-  implements
-    IFindClientByEmailRepository,
-    IFindPlanByTierRepository,
-    ISaveClientRepository,
-    IFindByIdClientRepository,
-    IUpdateClientRepository
-{
+export class FakeInMemoryClientsRepository implements IClientRepository {
   private static instance: FakeInMemoryClientsRepository;
 
   private constructor(
@@ -36,7 +23,7 @@ export class FakeInMemoryClientsRepository
           PlanEntity.create({
             id: '5532b773-be2f-42e5-a4da-a0856bf0d62c',
             tier: PLAN_TYPES.FREE,
-            durationInMilliseconds: 360000,
+            durationInMilliseconds: 3600000,
           }),
         ],
       );

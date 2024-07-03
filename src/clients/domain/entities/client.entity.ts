@@ -114,7 +114,7 @@ export class ClientEntity extends AggregateRoot {
       tier: args.planTier,
       durationInMilliseconds: args.quotaDuration,
     });
-    const linksQuota = plan.getValue().quota;
+    const linksQuota = args.linksQuota;
     const quotaRefreshIn = new Date(args.quotaRefreshIn);
 
     return new ClientEntity({
@@ -128,7 +128,7 @@ export class ClientEntity extends AggregateRoot {
     });
   }
 
-  public confirmLinkCretion(): void {
+  public confirmLinkCreation(): void {
     const now = new Date();
     if (now.getTime() - this.quotaRefreshIn.getTime() >= 3600000) {
       this.linksQuota = this.plan.getValue().quota;

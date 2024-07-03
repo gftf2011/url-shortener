@@ -1,11 +1,11 @@
 import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ClientsController } from './clients.controller';
-import { ClientsService } from './clients.service';
-import { MySqlClientsRepository } from './infra/repositories/clients';
-import { PasetoTokenProvider } from './infra/providers/token';
-import { IClientRepository } from './domain/repositories/clients';
-import { ITokenProvider } from './contracts/providers/token';
+import { ShortUrlController } from './short-url.controller';
+import { ShortUrlService } from './short-url.service';
+import { IShortUrlRepository } from './domain/repositories/redirect-url';
+import { IClientRepository } from '../clients/domain/repositories/clients';
+import { ClientsModule } from 'src/clients/clients.module';
 import { MysqlDBConnection } from '../common/infra/databases/mysql/connection';
+import { MySqlShortUrlRepository } from './infra/repositories/short-url/mysql.repository';
 import { MysqlTransaction } from '../common/infra/databases/mysql/transaction';
 import {
   IDbConnection,
@@ -13,7 +13,8 @@ import {
 } from '../common/app/contracts/databases';
 
 @Module({
-  controllers: [ClientsController],
+  imports: [ClientsModule],
+  controllers: [ShortUrlController],
   providers: [
     {
       provide: 'IDbConnection',
@@ -25,33 +26,24 @@ import {
       inject: ['IDbConnection'],
     },
     {
-      provide: 'IClientRepository',
+      provide: 'IShortUrlRepository',
       useFactory: (query: ISqlDbTransaction) => {
-        return new MySqlClientsRepository(query);
+        return new MySqlShortUrlRepository(query);
       },
       inject: ['ISqlDbTransaction'],
     },
     {
-      provide: 'ITokenProvider',
-      useFactory: () =>
-        new PasetoTokenProvider(
-          process.env.PRIVATE_KEY,
-          process.env.PUBLIC_KEY,
-        ),
-    },
-    {
-      provide: 'IClientService',
+      provide: 'IShortUrlService',
       useFactory: (
-        clientRepo: IClientRepository,
-        tokenProvider: ITokenProvider,
+        shortUrlRepo: IShortUrlRepository,
+        clientsRepo: IClientRepository,
         transaction: ISqlDbTransaction,
-      ) => new ClientsService(clientRepo, tokenProvider, transaction),
-      inject: ['IClientRepository', 'ITokenProvider', 'ISqlDbTransaction'],
+      ) => new ShortUrlService(shortUrlRepo, clientsRepo, transaction),
+      inject: ['IShortUrlRepository', 'IClientRepository', 'ISqlDbTransaction'],
     },
   ],
-  exports: ['IClientRepository', 'ITokenProvider'],
 })
-export class ClientsModule implements OnModuleInit, OnModuleDestroy {
+export class ShortUrlModule implements OnModuleInit, OnModuleDestroy {
   async onModuleInit(): Promise<void> {
     await MysqlDBConnection.getInstance().connect({
       connectionLimit: parseInt(process.env.MYSQL_CONN, 10),

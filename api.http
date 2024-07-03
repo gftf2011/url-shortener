@@ -14,7 +14,7 @@ content-type: application/json
 
 @accessToken = {{createAccount.response.body.accessToken}}
 
-# @name createRedirectUrl
+# @name createShortUrl
 POST {{url}}
 Content-Type: application/json
 Authorization: {{accessToken}}
