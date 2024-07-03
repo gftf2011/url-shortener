@@ -30,7 +30,7 @@ export class ShortUrlEntity extends AggregateRoot {
   private constructor(protected readonly props: Props) {
     super();
     this.id = IDValueObject.createAndValidateCustom(
-      ID_TYPE.INCREMENTAL_HEX_10,
+      ID_TYPE.INCREMENTAL_BASE36,
       props.id,
     );
     this.longUrl = URLValueObject.create(props.longUrl);

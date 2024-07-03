@@ -10,8 +10,9 @@ export class URLValueObject extends ValueObject {
   }
 
   static create(value: string): URLValueObject {
+    value = decodeURIComponent(value);
     URLValueObject.validate(value);
-    return new URLValueObject(value.toLowerCase());
+    return new URLValueObject(value);
   }
 
   private static validate(value: string): void {

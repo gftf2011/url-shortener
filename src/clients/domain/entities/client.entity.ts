@@ -140,6 +140,12 @@ export class ClientEntity extends AggregateRoot {
     this.linksQuota--;
   }
 
+  public async checkPasswordMatch(password: string): Promise<void> {
+    if (!this.password.compare(password)) {
+      throw new Error('password does not match');
+    }
+  }
+
   override getValue(): Value {
     return {
       email: this.email,

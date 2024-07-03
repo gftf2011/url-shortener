@@ -1,5 +1,8 @@
-export type ClientDTO = {
+export type CredentialsDTO = {
   email: string;
   password: string;
-  fullName: string;
 };
+
+export type ClientDTO = {
+  fullName: string;
+} & CredentialsDTO;

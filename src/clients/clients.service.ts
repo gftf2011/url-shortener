@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientDTO } from './domain/dtos';
+import { ClientDTO, CredentialsDTO } from './domain/dtos';
 import {
   IFindPlanByTierRepository,
   IFindClientByEmailRepository,
@@ -9,6 +9,7 @@ import { ClientEntity, PLAN_TYPES, PlanEntity } from './domain/entities';
 import { ITokenProvider } from './contracts/providers/token';
 import { IClientService } from './contracts/services';
 import { ISqlDbTransaction } from '../common/app/contracts/databases';
+import { EmailValueObject } from './domain/value-objects';
 
 type IClientRepository = IFindPlanByTierRepository &
   IFindClientByEmailRepository &
@@ -56,6 +57,41 @@ export class ClientsService implements IClientService {
       const accessToken = await this.tokenProvider.sign({
         clientId: client.getValue().id.value,
         planId: client.getValue().plan.getValue().id.value,
+      });
+
+      await this.transaction.commit();
+      await this.transaction.closeTransaction();
+
+      return {
+        accessToken,
+      };
+    } catch (e) {
+      await this.transaction.rollback();
+      await this.transaction.closeTransaction();
+      throw e;
+    }
+  }
+
+  public async loginToAccount(
+    input: CredentialsDTO,
+  ): Promise<{ accessToken: string }> {
+    try {
+      await this.transaction.createClient();
+      await this.transaction.openTransaction();
+
+      const foundClient = await this.clientRepo.findByEmail(
+        EmailValueObject.create(input.email),
+      );
+
+      if (!foundClient) {
+        throw new Error('account does not exists');
+      }
+
+      await foundClient.checkPasswordMatch(input.password);
+
+      const accessToken = await this.tokenProvider.sign({
+        clientId: foundClient.getValue().id.value,
+        planId: foundClient.getValue().plan.getValue().id.value,
       });
 
       await this.transaction.commit();

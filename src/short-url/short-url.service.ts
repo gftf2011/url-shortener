@@ -47,7 +47,6 @@ export class ShortUrlService implements IShortUrlService {
         throw new Error('client does not exists');
       }
       clientFound.confirmLinkCreation();
-      console.log(clientFound.getValue().linksQuota);
       await this.clientRepo.update(clientFound);
       await this.ShortUrlRepo.save(ShortUrl);
       await this.ShortUrlRepo.increaseLastId(ShortUrl);

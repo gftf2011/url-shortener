@@ -123,8 +123,6 @@ export class MySqlClientsRepository implements IClientRepository {
       values3,
     );
 
-    console.log(clientRows, clientPlanRows, planRows);
-
     return ClientEntity.create({
       email: clientRows[0].email,
       id: clientRows[0].id,

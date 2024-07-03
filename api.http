@@ -12,7 +12,18 @@ content-type: application/json
 
 ###
 
-@accessToken = {{createAccount.response.body.accessToken}}
+# @name loginToAccount
+POST {{url}}/clients/login
+content-type: application/json
+
+{
+    "email": "test@mail.com",
+    "password": "12345678bB#"
+}
+
+###
+
+@accessToken = {{loginToAccount.response.body.accessToken}}
 
 # @name createShortUrl
 POST {{url}}

@@ -23,10 +23,9 @@ export class MySqlShortUrlRepository implements IShortUrlRepository {
 
   async increaseLastId(entity: ShortUrlEntity): Promise<void> {
     let value = entity.getValue().id.value;
-    let decimalValue = parseInt(value, 16);
-
+    let decimalValue = parseInt(value, 36);
     decimalValue++;
-    value = decimalValue.toString(16).padStart(10, '0');
+    value = decimalValue.toString(36).padStart(10, '0');
 
     const command =
       'UPDATE short_urls_schema.counter SET last_id = ? WHERE table_name = ?;';

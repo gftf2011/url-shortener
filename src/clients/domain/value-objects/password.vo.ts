@@ -42,8 +42,11 @@ export class PasswordValueObject extends ValueObject {
     password: string,
   ): Promise<PasswordValueObject> {
     PasswordValueObject.validate(password);
-    const salt = await bcrypt.genSalt(10);
-    const newPassword = await bcrypt.hash(password, salt);
+    const newPassword = await bcrypt.hash(password, 12);
     return new PasswordValueObject(newPassword);
+  }
+
+  public async compare(plainTextPassword: string): Promise<boolean> {
+    return bcrypt.compare(plainTextPassword, this._value);
   }
 }
