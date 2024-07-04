@@ -1,4 +1,8 @@
 import { ValueObject } from '../../../common/domain';
+import {
+  InvalidEmptyFullNameError,
+  InvalidFewCharactersFullNameError,
+} from '../errors';
 
 const WHITE_SPACE_REGEX = /(\s)+/;
 
@@ -16,11 +20,11 @@ export class FullNameValueObject extends ValueObject {
       .split(WHITE_SPACE_REGEX)
       .filter((value: string) => value.trim().length > 0);
     if (names.length === 0) {
-      throw new Error(`name can not be empty`);
+      throw new InvalidEmptyFullNameError();
     }
     names.forEach((value: string) => {
       if (value.length < 2) {
-        throw new Error(`name: ${names.join(' ')} - is invalid`);
+        throw new InvalidFewCharactersFullNameError(names);
       }
     });
   }

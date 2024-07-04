@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcrypt';
 
 import { ValueObject } from '../../../common/domain';
+import { InvalidPasswordError } from '../errors';
 
 const WHITE_SPACE_REGEX = /(\s)+/;
 
@@ -30,7 +31,7 @@ export class PasswordValueObject extends ValueObject {
       password.replace(NON_UPPERCASE_LETTERS_REGEX, '').length < 1 ||
       password.replace(NON_SPECIAL_CHARACTER_REGEX, '').length < 1
     ) {
-      throw new Error('password is invalid');
+      throw new InvalidPasswordError();
     }
   }
 

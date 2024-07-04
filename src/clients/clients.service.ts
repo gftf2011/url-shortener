@@ -10,6 +10,7 @@ import { ITokenProvider } from './contracts/providers/token';
 import { IClientService } from './contracts/services';
 import { ISqlDbTransaction } from '../common/app/contracts/databases';
 import { EmailValueObject } from './domain/value-objects';
+import { AccountAlreadyExistsError, AccountDoesNotExistsError } from './errors';
 
 type IClientRepository = IFindPlanByTierRepository &
   IFindClientByEmailRepository &
@@ -49,7 +50,7 @@ export class ClientsService implements IClientService {
       );
 
       if (foundClient) {
-        throw new Error('account already exists');
+        throw new AccountAlreadyExistsError();
       }
 
       await this.clientRepo.save(client);
@@ -84,7 +85,7 @@ export class ClientsService implements IClientService {
       );
 
       if (!foundClient) {
-        throw new Error('account does not exists');
+        throw new AccountDoesNotExistsError();
       }
 
       await foundClient.checkPasswordMatch(input.password);

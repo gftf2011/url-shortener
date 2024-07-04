@@ -1,5 +1,6 @@
 import { v4, validate } from 'uuid';
 import { ValueObject } from '../../../common/domain';
+import { InvalidUUIDError } from '../errors';
 
 export class UUIDValueObject extends ValueObject {
   private constructor(private readonly _value: string) {
@@ -12,7 +13,7 @@ export class UUIDValueObject extends ValueObject {
 
   private static isValid(value: string): void {
     if (!validate(value)) {
-      throw new Error(`uuid: ${value} - is not valid`);
+      throw new InvalidUUIDError(value);
     }
   }
 

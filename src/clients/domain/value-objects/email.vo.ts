@@ -1,4 +1,5 @@
 import { ValueObject } from '../../../common/domain';
+import { InvalidEmailError } from '../errors';
 
 /**
  * @desc Email regex
@@ -24,7 +25,7 @@ export class EmailValueObject extends ValueObject {
 
   private static validate(value: string): void {
     if (!VALID_EMAIL_REGEX.test(value)) {
-      throw new Error(`email: ${value} - is not valid`);
+      throw new InvalidEmailError(value);
     }
   }
 }

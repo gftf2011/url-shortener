@@ -1,4 +1,5 @@
 import { AggregateRoot } from '../../../common/domain';
+import { ExceededLinksQuotaError, PasswordDoesNotMatchError } from '../errors';
 import {
   EmailValueObject,
   FullNameValueObject,
@@ -135,14 +136,14 @@ export class ClientEntity extends AggregateRoot {
       this.quotaRefreshIn = now;
     }
     if (this.linksQuota === 0) {
-      throw new Error('link creation quota exceeded');
+      throw new ExceededLinksQuotaError();
     }
     this.linksQuota--;
   }
 
   public async checkPasswordMatch(password: string): Promise<void> {
-    if (!this.password.compare(password)) {
-      throw new Error('password does not match');
+    if (!await this.password.compare(password)) {
+      throw new PasswordDoesNotMatchError();
     }
   }
 
