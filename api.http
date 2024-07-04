@@ -33,3 +33,11 @@ Authorization: {{accessToken}}
 {
     "longUrl": "https://www.google.com"
 }
+
+###
+
+@shortLink = {{createShortUrl.response.body.id}}
+
+# @name redirect
+GET {{url}}/{{shortLink}}
+Content-Type: application/json

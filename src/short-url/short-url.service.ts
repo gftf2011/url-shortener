@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ShortUrlEntity } from './domain/entities';
 import {
+  IFindByIdShortUrlRepository,
   IGetLastIdShortUrlRepository,
   IIncreaseLastIdShortUrlRepository,
   ISaveShortUrlRepository,
@@ -11,10 +12,13 @@ import {
   IUpdateClientRepository,
 } from '../clients/domain/repositories/clients';
 import { ISqlDbTransaction } from '../common/app/contracts/databases';
+import { UUIDValueObject } from '../clients/domain/value-objects';
+import { IDValueObject, ID_TYPE } from './domain/value-objects';
 
 type IShortUrlRepository = IGetLastIdShortUrlRepository &
   ISaveShortUrlRepository &
-  IIncreaseLastIdShortUrlRepository;
+  IIncreaseLastIdShortUrlRepository &
+  IFindByIdShortUrlRepository;
 
 type IClientRepository = IFindByIdClientRepository & IUpdateClientRepository;
 
@@ -39,7 +43,7 @@ export class ShortUrlService implements IShortUrlService {
 
       await this.transaction.unlockTables();
 
-      const ShortUrl = ShortUrlEntity.create({ id, longUrl, clientId });
+      const ShortUrl = ShortUrlEntity.createNew({ id, longUrl, clientId });
       const clientFound = await this.clientRepo.findById(
         ShortUrl.getValue().clientId,
       );
@@ -57,6 +61,33 @@ export class ShortUrlService implements IShortUrlService {
       return ShortUrl.getValue().id.value;
     } catch (e) {
       await this.transaction.unlockTables();
+      await this.transaction.rollback();
+      await this.transaction.closeTransaction();
+      throw e;
+    }
+  }
+
+  async get(shortUrlId: string): Promise<string> {
+    try {
+      await this.transaction.createClient();
+      await this.transaction.openTransaction();
+
+      const foundShortUrl = await this.ShortUrlRepo.findById(
+        IDValueObject.createAndValidateCustom(
+          ID_TYPE.INCREMENTAL_BASE36,
+          shortUrlId,
+        ),
+      );
+
+      if (!foundShortUrl) {
+        throw new Error('URL does not exists');
+      }
+
+      await this.transaction.commit();
+      await this.transaction.closeTransaction();
+
+      return foundShortUrl.getValue().longUrl.value;
+    } catch (e) {
       await this.transaction.rollback();
       await this.transaction.closeTransaction();
       throw e;

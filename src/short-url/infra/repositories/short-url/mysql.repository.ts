@@ -3,10 +3,28 @@ import { ShortUrlEntity } from '../../../domain/entities';
 import { IShortUrlRepository } from '../../../domain/repositories/redirect-url';
 import { Inject, Injectable } from '@nestjs/common';
 import { ISqlDbQuery } from '../../../../common/app/contracts/databases';
+import { IDValueObject } from 'src/short-url/domain/value-objects';
 
 @Injectable()
 export class MySqlShortUrlRepository implements IShortUrlRepository {
   constructor(@Inject('ISqlDbTransaction') private readonly db: ISqlDbQuery) {}
+
+  async findById(shortUrlId: IDValueObject): Promise<ShortUrlEntity> {
+    const command = 'SELECT * FROM short_urls_schema.short_urls WHERE id = ?;';
+    const values = [shortUrlId.value];
+
+    const [rows] = await (this.db as mysql.PoolConnection).query(
+      command,
+      values,
+    );
+
+    return ShortUrlEntity.create({
+      clientId: rows[0].client_id,
+      longUrl: rows[0].long_url,
+      id: rows[0].id,
+      createdAt: rows[0].created_at,
+    });
+  }
 
   async save(entity: ShortUrlEntity): Promise<void> {
     const command =

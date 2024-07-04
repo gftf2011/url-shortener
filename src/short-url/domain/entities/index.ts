@@ -1,1 +1,1 @@
-export * from './redirect-url.entity';
+export * from './short-url.entity';

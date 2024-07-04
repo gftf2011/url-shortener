@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS short_urls_schema.short_urls (
 ALTER TABLE short_urls_schema.short_urls ADD CONSTRAINT pk_short_urls_id PRIMARY KEY (id);
 ALTER TABLE short_urls_schema.short_urls ADD CONSTRAINT fk_short_urls_client_id FOREIGN KEY (client_id) REFERENCES clients_schema.clients (id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-CREATE UNIQUE INDEX idx_btree_short_urls_by_client_id_id ON short_urls_schema.short_urls (client_id, id);
+CREATE UNIQUE INDEX idx_btree_short_urls_by_id ON short_urls_schema.short_urls (id);
 
 GRANT SELECT ON clients_schema.plans TO 'app'@'%';
 GRANT SELECT, INSERT, UPDATE ON clients_schema.clients TO 'app'@'%';

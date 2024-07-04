@@ -38,7 +38,7 @@ export class ShortUrlEntity extends AggregateRoot {
     this.createdAt = new Date(props.createdAt);
   }
 
-  static create({
+  static createNew({
     id,
     longUrl,
     clientId,
@@ -48,6 +48,20 @@ export class ShortUrlEntity extends AggregateRoot {
     clientId: string;
   }): ShortUrlEntity {
     return new ShortUrlEntity({ id, longUrl, clientId, createdAt: Date.now() });
+  }
+
+  static create({
+    id,
+    longUrl,
+    clientId,
+    createdAt,
+  }: {
+    id: string;
+    longUrl: string;
+    clientId: string;
+    createdAt: number;
+  }): ShortUrlEntity {
+    return new ShortUrlEntity({ id, longUrl, clientId, createdAt });
   }
 
   override getValue(): Value {

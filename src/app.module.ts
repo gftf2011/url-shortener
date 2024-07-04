@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ShortUrlModule } from './short-url/short-url.module';
 import { ClientsModule } from './clients/clients.module';
@@ -14,6 +19,9 @@ import { ShortUrlController } from './short-url/short-url.controller';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(ShortUrlController);
+    consumer
+      .apply(AuthMiddleware)
+      .exclude({ path: ':id', method: RequestMethod.GET })
+      .forRoutes(ShortUrlController);
   }
 }

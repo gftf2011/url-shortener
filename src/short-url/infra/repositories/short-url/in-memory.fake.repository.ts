@@ -1,3 +1,4 @@
+import { IDValueObject } from '../../../domain/value-objects';
 import { ShortUrlEntity } from '../../../domain/entities';
 import { IShortUrlRepository } from '../../../domain/repositories/redirect-url';
 import { Injectable } from '@nestjs/common';
@@ -30,13 +31,20 @@ export class FakeInMemoryShortUrlRepository implements IShortUrlRepository {
 
   async increaseLastId(entity: ShortUrlEntity): Promise<void> {
     let value = entity.getValue().id.value;
-    let decimalValue = parseInt(value, 16);
+    let decimalValue = parseInt(value, 36);
     decimalValue++;
-    value = decimalValue.toString(16).padStart(10, '0');
+    value = decimalValue.toString(36).padStart(10, '0');
     this.shortUrlsDataCounter.short_urls.last_id = value;
   }
 
   async getLastId(): Promise<string> {
     return this.shortUrlsDataCounter.short_urls.last_id;
+  }
+
+  async findById(shortUrlId: IDValueObject): Promise<ShortUrlEntity> {
+    const shortUrl = this.shortUrlsDataRecords.find(
+      (entity) => entity.getValue().id.value === shortUrlId.value,
+    );
+    return shortUrl;
   }
 }
