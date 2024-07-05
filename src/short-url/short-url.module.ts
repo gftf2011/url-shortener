@@ -11,6 +11,7 @@ import {
   IDbConnection,
   ISqlDbTransaction,
 } from '../common/app/contracts/databases';
+import { UnitOfWorkDecorator } from './unit-of-work';
 
 @Module({
   imports: [ClientsModule],
@@ -38,7 +39,11 @@ import {
         shortUrlRepo: IShortUrlRepository,
         clientsRepo: IClientRepository,
         transaction: ISqlDbTransaction,
-      ) => new ShortUrlService(shortUrlRepo, clientsRepo, transaction),
+      ) =>
+        new UnitOfWorkDecorator(
+          new ShortUrlService(shortUrlRepo, clientsRepo, transaction),
+          transaction,
+        ),
       inject: ['IShortUrlRepository', 'IClientRepository', 'ISqlDbTransaction'],
     },
   ],

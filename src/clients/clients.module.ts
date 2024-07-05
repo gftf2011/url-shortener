@@ -11,6 +11,7 @@ import {
   IDbConnection,
   ISqlDbTransaction,
 } from '../common/app/contracts/databases';
+import { UnitOfWorkDecorator } from './unit-of-work';
 
 @Module({
   controllers: [ClientsController],
@@ -45,7 +46,11 @@ import {
         clientRepo: IClientRepository,
         tokenProvider: ITokenProvider,
         transaction: ISqlDbTransaction,
-      ) => new ClientsService(clientRepo, tokenProvider, transaction),
+      ) =>
+        new UnitOfWorkDecorator(
+          new ClientsService(clientRepo, tokenProvider),
+          transaction,
+        ),
       inject: ['IClientRepository', 'ITokenProvider', 'ISqlDbTransaction'],
     },
   ],
