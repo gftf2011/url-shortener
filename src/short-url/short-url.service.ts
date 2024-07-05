@@ -12,8 +12,9 @@ import {
   IUpdateClientRepository,
 } from '../clients/domain/repositories/clients';
 import { ISqlDbTransaction } from '../common/app/contracts/databases';
-import { UUIDValueObject } from '../clients/domain/value-objects';
 import { IDValueObject, ID_TYPE } from './domain/value-objects';
+import { ShortURLDoesExistsError } from './errors';
+import { AccountDoesNotExistsError } from '../clients/errors';
 
 type IShortUrlRepository = IGetLastIdShortUrlRepository &
   ISaveShortUrlRepository &
@@ -48,7 +49,7 @@ export class ShortUrlService implements IShortUrlService {
         ShortUrl.getValue().clientId,
       );
       if (!clientFound) {
-        throw new Error('client does not exists');
+        throw new AccountDoesNotExistsError();
       }
       clientFound.confirmLinkCreation();
       await this.clientRepo.update(clientFound);
@@ -80,7 +81,7 @@ export class ShortUrlService implements IShortUrlService {
       );
 
       if (!foundShortUrl) {
-        throw new Error('URL does not exists');
+        throw new ShortURLDoesExistsError();
       }
 
       await this.transaction.commit();

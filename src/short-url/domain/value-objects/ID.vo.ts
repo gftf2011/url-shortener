@@ -1,4 +1,5 @@
 import { ValueObject } from '../../../common/domain';
+import { InvalidIDError } from '../errors';
 
 export enum ID_TYPE {
   INCREMENTAL_HEX = 'INCREMENTAL_HEX',
@@ -19,7 +20,7 @@ export class IDValueObject extends ValueObject {
       case ID_TYPE.INCREMENTAL_HEX: {
         const regex = new RegExp(`^[0-9a-f]{10}$`);
         if (!regex.test(value)) {
-          throw new Error(`id: ${value} - is invalid`);
+          throw new InvalidIDError(value);
         }
 
         return new IDValueObject(value.toLowerCase());
@@ -27,7 +28,7 @@ export class IDValueObject extends ValueObject {
       case ID_TYPE.INCREMENTAL_BASE36: {
         const regex = new RegExp(`^[0-9a-fA-Z]{10}$`);
         if (!regex.test(value)) {
-          throw new Error(`id: ${value} - is invalid`);
+          throw new InvalidIDError(value);
         }
 
         return new IDValueObject(value);
@@ -35,7 +36,7 @@ export class IDValueObject extends ValueObject {
       default: {
         const regex = new RegExp(`^[0-9a-f]{10}$`);
         if (!regex.test(value)) {
-          throw new Error(`id: ${value} - is invalid`);
+          throw new InvalidIDError(value);
         }
 
         return new IDValueObject(value.toLowerCase());

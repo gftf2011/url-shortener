@@ -1,4 +1,5 @@
 import { ValueObject } from '../../../common/domain';
+import { InvalidURLFormatError, InvalidURLTooLongError } from '../errors';
 
 export class URLValueObject extends ValueObject {
   private constructor(private readonly _value: string) {
@@ -18,11 +19,11 @@ export class URLValueObject extends ValueObject {
   private static validate(value: string): void {
     const regex = /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
     if (!regex.test(value)) {
-      throw new Error(`url: ${value} - is not valid`);
+      throw new InvalidURLFormatError(value);
     }
 
     if (value.length > 512) {
-      throw new Error('url is too long');
+      throw new InvalidURLTooLongError(value, 512);
     }
   }
 }
