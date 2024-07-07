@@ -66,6 +66,7 @@ import { CacheShortUrlOnFindByIdDecorator } from './infra/repositories/short-url
       inject: ['IShortUrlRepository', 'IClientRepository', 'MysqlTransaction'],
     },
   ],
+  exports: ['RedisTransaction'],
 })
 export class ShortUrlModule implements OnModuleInit, OnModuleDestroy {
   async onModuleInit(): Promise<void> {
@@ -92,8 +93,6 @@ export class ShortUrlModule implements OnModuleInit, OnModuleDestroy {
 
   async onModuleDestroy(): Promise<void> {
     await MysqlDBConnection.getInstance().disconnect();
-    console.log('1');
     await RedisDBConnection.getInstance().disconnect();
-    console.log('2');
   }
 }
