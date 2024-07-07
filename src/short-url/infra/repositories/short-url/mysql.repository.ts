@@ -1,13 +1,11 @@
 import mysql from 'mysql2/promise';
 import { ShortUrlEntity } from '../../../domain/entities';
 import { IShortUrlRepository } from '../../../domain/repositories/redirect-url';
-import { Inject, Injectable } from '@nestjs/common';
 import { ISqlDbQuery } from '../../../../common/app/contracts/databases';
 import { IDValueObject } from 'src/short-url/domain/value-objects';
 
-@Injectable()
 export class MySqlShortUrlRepository implements IShortUrlRepository {
-  constructor(@Inject('ISqlDbTransaction') private readonly db: ISqlDbQuery) {}
+  constructor(private readonly db: ISqlDbQuery) {}
 
   async findById(shortUrlId: IDValueObject): Promise<ShortUrlEntity> {
     const command = 'SELECT * FROM short_urls_schema.short_urls WHERE id = ?;';

@@ -21,3 +21,18 @@ export interface ISqlDbTransaction extends ISqlDbQuery, ISqlDbLocker {
   rollback: () => Promise<void>;
   close: () => Promise<void>;
 }
+
+export interface IKeyValueDbCommands {
+  set: (
+    key: string,
+    value: string,
+    options?: { ttl_in_milliseconds: number },
+  ) => Promise<void>;
+  get: (ket: string) => Promise<string>;
+}
+
+export interface IKeyValueDbTransaction extends IKeyValueDbCommands {
+  createClient: () => Promise<void>;
+  close: () => Promise<void>;
+  release: () => Promise<void>;
+}

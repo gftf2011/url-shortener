@@ -9,29 +9,48 @@ import { MySqlShortUrlRepository } from './infra/repositories/short-url/mysql.re
 import { MysqlTransaction } from '../common/infra/databases/mysql/transaction';
 import {
   IDbConnection,
+  IKeyValueDbTransaction,
   ISqlDbTransaction,
 } from '../common/app/contracts/databases';
 import { UnitOfWorkDecorator } from './unit-of-work';
+import { RedisDBConnection } from '../common/infra/databases/redis/connection';
+import { RedisTransaction } from '../common/infra/databases/redis/transaction';
+import { CacheShortUrlOnFindByIdDecorator } from './infra/repositories/short-url/decorators';
 
 @Module({
   imports: [ClientsModule],
   controllers: [ShortUrlController],
   providers: [
     {
-      provide: 'IDbConnection',
+      provide: 'MysqlDBConnection',
       useFactory: () => MysqlDBConnection.getInstance(),
     },
     {
-      provide: 'ISqlDbTransaction',
+      provide: 'RedisConnection',
+      useFactory: () => RedisDBConnection.getInstance(),
+    },
+    {
+      provide: 'MysqlTransaction',
       useFactory: (conn: IDbConnection) => new MysqlTransaction(conn),
-      inject: ['IDbConnection'],
+      inject: ['MysqlDBConnection'],
+    },
+    {
+      provide: 'RedisTransaction',
+      useFactory: (conn: IDbConnection) => new RedisTransaction(conn),
+      inject: ['RedisConnection'],
     },
     {
       provide: 'IShortUrlRepository',
-      useFactory: (query: ISqlDbTransaction) => {
-        return new MySqlShortUrlRepository(query);
+      useFactory: (
+        mysqlQuery: ISqlDbTransaction,
+        redisTransaction: IKeyValueDbTransaction,
+      ) => {
+        return new CacheShortUrlOnFindByIdDecorator(
+          new MySqlShortUrlRepository(mysqlQuery),
+          redisTransaction,
+        );
       },
-      inject: ['ISqlDbTransaction'],
+      inject: ['MysqlTransaction', 'RedisTransaction'],
     },
     {
       provide: 'IShortUrlService',
@@ -44,7 +63,7 @@ import { UnitOfWorkDecorator } from './unit-of-work';
           new ShortUrlService(shortUrlRepo, clientsRepo, transaction),
           transaction,
         ),
-      inject: ['IShortUrlRepository', 'IClientRepository', 'ISqlDbTransaction'],
+      inject: ['IShortUrlRepository', 'IClientRepository', 'MysqlTransaction'],
     },
   ],
 })
@@ -60,9 +79,21 @@ export class ShortUrlModule implements OnModuleInit, OnModuleDestroy {
       host: process.env.MYSQL_HOST,
       password: process.env.MYSQL_PASSWORD,
     });
+
+    await RedisDBConnection.getInstance().connect({
+      db: parseInt(process.env.REDIS_DB, 10),
+      port: parseInt(process.env.REDIS_PORT, 10),
+      user: process.env.REDIS_CLIENT_USER,
+      pass: process.env.REDIS_CLIENT_PASS,
+      host: process.env.REDIS_HOST,
+      maxClients: parseInt(process.env.REDIS_CONN, 10),
+    });
   }
 
   async onModuleDestroy(): Promise<void> {
     await MysqlDBConnection.getInstance().disconnect();
+    console.log('1');
+    await RedisDBConnection.getInstance().disconnect();
+    console.log('2');
   }
 }

@@ -1,9 +1,7 @@
 import { IDValueObject } from '../../../domain/value-objects';
 import { ShortUrlEntity } from '../../../domain/entities';
 import { IShortUrlRepository } from '../../../domain/repositories/redirect-url';
-import { Injectable } from '@nestjs/common';
 
-@Injectable()
 export class FakeInMemoryShortUrlRepository implements IShortUrlRepository {
   private static instance: FakeInMemoryShortUrlRepository;
 

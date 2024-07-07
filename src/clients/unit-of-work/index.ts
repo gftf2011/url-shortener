@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { ISqlDbTransaction } from '../../common/app/contracts/databases';
 import { IClientService } from '../contracts/services';
 import { ClientDTO, CredentialsDTO } from '../domain/dtos';

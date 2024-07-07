@@ -41,7 +41,7 @@ export class MysqlDBConnection implements IDbConnection {
         enableKeepAlive: false,
       });
 
-      let connected: boolean = false;
+      let connection: mysql.PoolConnection = null;
 
       const sleep = async (ms: number): Promise<void> => {
         return new Promise((resolve) => {
@@ -53,15 +53,16 @@ export class MysqlDBConnection implements IDbConnection {
        * Retry connection logic, postgres pool must
        * be tested before clients are created
        */
-      while (!connected) {
+      while (!connection) {
         try {
           await sleep(1000);
-          await pool.ping();
-          connected = true;
+          connection = await pool.getConnection();
         } catch (err) {
-          connected = true;
+          connection = null;
         }
       }
+
+      connection.release();
 
       MysqlDBConnection.pool = pool;
     }
