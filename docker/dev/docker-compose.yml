@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: ./docker/dev/image/mysql/Dockerfile
       args:
+        mysql_root_user: ${MYSQL_ROOT_USER}
         mysql_root_password: ${MYSQL_ROOT_PASSWORD}
         mysql_database: ${MYSQL_DATABASE}
         mysql_user: ${MYSQL_USER}
