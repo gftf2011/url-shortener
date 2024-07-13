@@ -28,7 +28,8 @@ export interface IKeyValueDbCommands {
     value: string,
     options?: { ttl_in_milliseconds: number },
   ) => Promise<void>;
-  get: (ket: string) => Promise<string>;
+  get: (key: string) => Promise<string>;
+  del: (key: string) => Promise<void>;
 }
 
 export interface IKeyValueDbTransaction extends IKeyValueDbCommands {

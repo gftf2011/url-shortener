@@ -72,6 +72,23 @@ services:
     volumes:
       - cache_data:/data
 
+  cache_db_commander:
+    container_name: redis-commander_cache_db_dev
+    build:
+      context: .
+      dockerfile: ./docker/dev/image/redis-commander/Dockerfile
+      args:
+        port: 8081
+        redis_client_pass: ${REDIS_SERVER_PASS}
+        redis_client_port: 6379
+        redis_client_host: cache-db
+        redis_client_db_index: ${REDIS_DB}
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    depends_on:
+      - cache-db
+
 volumes:
   core_data:
   cache_data:

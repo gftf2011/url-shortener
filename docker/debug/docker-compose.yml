@@ -18,6 +18,22 @@ services:
       - core_data:/var/lib/mysql
     ports:
       - ${MYSQL_PORT}:3306
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          '${MYSQL_HOST}',
+          '-u',
+          '${MYSQL_USER}',
+          '--password=${MYSQL_PASSWORD}',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
 
   core_db_admin:
     container_name: phpmyadmin_core_db_debug
@@ -32,7 +48,8 @@ services:
         phpmyadmin_pma_arbitrary: 0
     restart: unless-stopped
     depends_on:
-      - core-db
+      core-db:
+        condition: service_healthy
     ports:
       - '127.0.0.1:${PHPMYADMIN_PORT}:80'
 
@@ -53,6 +70,23 @@ services:
       - ${REDIS_PORT}:6379
     volumes:
       - cache_data:/data
+
+  cache_db_commander:
+    container_name: redis-commander_cache_db_debug
+    build:
+      context: .
+      dockerfile: ./docker/debug/image/redis-commander/Dockerfile
+      args:
+        port: 8081
+        redis_client_pass: ${REDIS_SERVER_PASS}
+        redis_client_port: 6379
+        redis_client_host: cache-db
+        redis_client_db_index: ${REDIS_DB}
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    depends_on:
+      - cache-db
 
 volumes:
   core_data:

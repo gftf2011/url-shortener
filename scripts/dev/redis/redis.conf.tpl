@@ -13,4 +13,4 @@ requirepass ${REDIS_SERVER_PASS}
 port ${REDIS_PORT}
 
 # ACL rules for users
-user ${REDIS_CLIENT_USER} on >${REDIS_CLIENT_PASS} ~* +@read +@write +ping +quit +info
+user ${REDIS_CLIENT_USER} on >${REDIS_CLIENT_PASS} ~* +@read +@write +ping +quit +info +del

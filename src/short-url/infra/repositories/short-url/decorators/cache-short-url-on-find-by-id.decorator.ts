@@ -11,6 +11,9 @@ export class CacheShortUrlOnFindByIdDecorator implements IShortUrlRepository {
 
   async findById(shortUrlId: IDValueObject): Promise<ShortUrlEntity> {
     const entity = await this.repo.findById(shortUrlId);
+    /**
+     * Failover approach avoid crashing the application allowing the cache handling
+     */
     try {
       await this.db.createClient();
       await this.db.set(
@@ -20,6 +23,7 @@ export class CacheShortUrlOnFindByIdDecorator implements IShortUrlRepository {
       );
       await this.db.release();
     } catch (e) {
+      await this.db.del(entity.getValue().id.value);
       await this.db.release();
     }
     return entity;

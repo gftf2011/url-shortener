@@ -33,6 +33,10 @@ export class RedisTransaction implements IKeyValueDbTransaction {
     return await this.client.get(key);
   }
 
+  public async del(key: string): Promise<void> {
+    await this.client.del(key);
+  }
+
   public async release(): Promise<void> {
     await this.pool.release(this.client);
   }
