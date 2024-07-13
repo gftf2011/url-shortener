@@ -1,73 +1,107 @@
+<div align="center">
+	<h1>CLEAN Nest.JS URL-SHORTNER</h1>
+</div>
+
+<br/>
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<br/>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+<p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+<p align="center">
 
-## Description
+<br/>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+<div align="center">
+  <a href="#page_facing_up-about">About</a> •
+  <a href="#hammer_and_wrench-supported-os">Supported OS</a> • 
+  <a href="#large_blue_diamond-design-patterns">Design Patterns</a> •
+  <a href="#blue_book-principles">Principles</a> •
+  <a href="#clipboard-required-tools">Required Tools</a> •
+  <a href="#racing_car-running-project">Running Project</a> •
+  <a href="#memo-license">License</a>
+</div>
 
-## Installation
+## :page_facing_up: About
 
-```bash
-$ npm install
+This a backend APP from a URL-SHORTENER Nest.JS typescript project.
+
+The objective from this project was to explore the framework by creating a well defined set of APIs with a decoupled architecture using Clean Architecture and D.D.D. - (Domain Driven Design) and exploring architecture capabilities like caching and design capabilities with several design patterns.
+
+<br/>
+
+## :hammer_and_wrench: Supported OS
+
+- [x] Mac OS
+- [x] Linux
+- [x] Windows - WSL 
+
+<br/>
+
+## :large_blue_diamond: Design Patterns
+
+### Creational
+
+- [Factory Method](https://refactoring.guru/design-patterns/factory-method)
+- [Singleton](https://refactoring.guru/design-patterns/singleton)
+
+### Structural
+
+- [Adapter](https://refactoring.guru/design-patterns/adapter)
+- [Decorator](https://refactoring.guru/design-patterns/decorator)
+- [Proxy](https://refactoring.guru/design-patterns/proxy)
+
+<br/>
+
+## :blue_book: Principles
+
+- [Single Responsibility Principle (SRP)](https://en.wikipedia.org/wiki/Single-responsibility_principle)
+- [Open Closed Principle (OCP)](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)
+- [Liskov Substitution Principle (LSP)](https://en.wikipedia.org/wiki/Liskov_substitution_principle)
+- [Interface Segregation Principle (ISP)](https://en.wikipedia.org/wiki/Interface_segregation_principle)
+- [Dependency Inversion Principle (DIP)](https://en.wikipedia.org/wiki/Dependency_inversion_principle)
+- [Separation of Concerns (SOC)](https://en.wikipedia.org/wiki/Separation_of_concerns)
+- [Don't Repeat Yourself (DRY)](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
+- [You Aren't Gonna Need It (YAGNI)](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it)
+- [Keep It Simple, Stupid (KISS)](https://en.wikipedia.org/wiki/KISS_principle)
+- [Composition Over Inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance)
+
+<br/>
+
+## :clipboard: Required Tools
+
+- [x] Nest - [http://nestjs.com/](http://nestjs.com/)
+  - Nest version: 10.3.2
+- [x] Node - [https://nodejs.org/](https://nodejs.org/)
+  - Node version: 20.11.0
+  - npm version: 10.2.x
+- [x] Docker - [https://www.docker.com/](https://www.docker.com/)
+
+<br/>
+
+## :racing_car: Running Project
+
+DEVELOPMENT
+```sh
+  $ npm i
+  $ npm run start:dev
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+DEBUG
+```sh
+  $ npm i
+  $ npm run start:debug
 ```
 
-## Test
+<br/>
 
-```bash
-# unit tests
-$ npm run test
+## :memo: License
 
-# e2e tests
-$ npm run test:e2e
+This project is under MIT license. See the [LICENSE](https://github.com/gftf2011/url-shortener/blob/main/LICENSE) file for more details.
 
-# test coverage
-$ npm run test:cov
-```
+---
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Made with lots of :heart: by [Gabriel Ferrari Tarallo Ferraz](https://www.linkedin.com/in/gabriel-ferrari-tarallo-ferraz/)
