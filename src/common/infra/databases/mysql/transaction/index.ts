@@ -29,6 +29,10 @@ export class MysqlTransaction implements ISqlDbTransaction {
     await this.client.query(`LOCK TABLES ${table} READ;`);
   }
 
+  public async lockWriteTable(table: string): Promise<void> {
+    await this.client.query(`LOCK TABLES ${table} WRITE;`);
+  }
+
   public async unlockTables(): Promise<void> {
     await this.client.query('UNLOCK TABLES;');
   }

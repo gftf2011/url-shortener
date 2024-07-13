@@ -10,6 +10,7 @@ export interface ISqlDbQuery {
 
 export interface ISqlDbLocker {
   lockReadTable: (table: string) => Promise<void>;
+  lockWriteTable: (table: string) => Promise<void>;
   unlockTables: () => Promise<void>;
 }
 

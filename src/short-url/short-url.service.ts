@@ -14,6 +14,7 @@ import { ISqlDbLocker } from '../common/app/contracts/databases';
 import { IDValueObject, ID_TYPE } from './domain/value-objects';
 import { ShortURLDoesExistsError } from './errors';
 import { AccountDoesNotExistsError } from '../clients/errors';
+import { UUIDValueObject } from '../clients/domain/value-objects';
 
 type IShortUrlRepository = IGetLastIdShortUrlRepository &
   ISaveShortUrlRepository &
@@ -30,21 +31,25 @@ export class ShortUrlService implements IShortUrlService {
   ) {}
 
   async create(longUrl: string, clientId: string): Promise<string> {
-    await this.locker.lockReadTable('short_urls_schema.counter');
-    const id = await this.ShortUrlRepo.getLastId();
-    await this.locker.unlockTables();
-
-    const ShortUrl = ShortUrlEntity.createNew({ id, longUrl, clientId });
     const clientFound = await this.clientRepo.findById(
-      ShortUrl.getValue().clientId,
+      UUIDValueObject.tryToCreate(clientId),
     );
     if (!clientFound) {
       throw new AccountDoesNotExistsError();
     }
     clientFound.confirmLinkCreation();
+
+    await this.locker.lockReadTable('short_urls_schema.counter');
+    await this.locker.lockWriteTable('short_urls_schema.counter');
+
+    const id = await this.ShortUrlRepo.getLastId();
+    const ShortUrl = ShortUrlEntity.createNew({ id, longUrl, clientId });
+    await this.ShortUrlRepo.increaseLastId(ShortUrl);
+
+    await this.locker.unlockTables();
+
     await this.clientRepo.update(clientFound);
     await this.ShortUrlRepo.save(ShortUrl);
-    await this.ShortUrlRepo.increaseLastId(ShortUrl);
 
     return ShortUrl.getValue().id.value;
   }

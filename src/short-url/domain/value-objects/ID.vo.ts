@@ -26,7 +26,7 @@ export class IDValueObject extends ValueObject {
         return new IDValueObject(value.toLowerCase());
       }
       case ID_TYPE.INCREMENTAL_BASE36: {
-        const regex = new RegExp(`^[0-9a-fA-Z]{10}$`);
+        const regex = new RegExp(`^[0-9a-z]{10}$`);
         if (!regex.test(value)) {
           throw new InvalidIDError(value);
         }
