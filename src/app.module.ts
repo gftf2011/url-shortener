@@ -26,10 +26,16 @@ export class AppModule implements NestModule {
       .forRoutes(ShortUrlController);
     consumer
       .apply(GetCachedShortUrlMiddleware)
-      .exclude({
-        path: '/',
-        method: RequestMethod.POST,
-      })
+      .exclude(
+        {
+          path: '/',
+          method: RequestMethod.POST,
+        },
+        {
+          path: ':id',
+          method: RequestMethod.DELETE,
+        },
+      )
       .forRoutes(ShortUrlController);
   }
 }

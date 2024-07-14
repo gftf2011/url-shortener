@@ -43,4 +43,18 @@ export class UnitOfWorkDecorator implements IShortUrlService {
       throw e;
     }
   }
+
+  public async delete(clientId: string, shortUrlId: string): Promise<void> {
+    try {
+      await this.transaction.createClient();
+      await this.transaction.openTransaction();
+      await this.decoratee.delete(clientId, shortUrlId);
+      await this.transaction.commit();
+      await this.transaction.closeTransaction();
+    } catch (e) {
+      await this.transaction.rollback();
+      await this.transaction.closeTransaction();
+      throw e;
+    }
+  }
 }

@@ -4,6 +4,7 @@ import {
   IGetLastIdShortUrlRepository,
   IIncreaseLastIdShortUrlRepository,
   ISaveShortUrlRepository,
+  IDeleteShortUrlRepository,
 } from './domain/repositories/redirect-url';
 import { IShortUrlService } from './contracts/services';
 import {
@@ -12,14 +13,15 @@ import {
 } from '../clients/domain/repositories/clients';
 import { ISqlDbLocker } from '../common/app/contracts/databases';
 import { IDValueObject, ID_TYPE } from './domain/value-objects';
-import { ShortURLDoesExistsError } from './errors';
+import { ShortURLDoesNotExistsError } from './errors';
 import { AccountDoesNotExistsError } from '../clients/errors';
 import { UUIDValueObject } from '../clients/domain/value-objects';
 
 type IShortUrlRepository = IGetLastIdShortUrlRepository &
   ISaveShortUrlRepository &
   IIncreaseLastIdShortUrlRepository &
-  IFindByIdShortUrlRepository;
+  IFindByIdShortUrlRepository &
+  IDeleteShortUrlRepository;
 
 type IClientRepository = IFindByIdClientRepository & IUpdateClientRepository;
 
@@ -62,10 +64,35 @@ export class ShortUrlService implements IShortUrlService {
       ),
     );
 
-    if (!foundShortUrl) {
-      throw new ShortURLDoesExistsError();
+    if (!foundShortUrl || foundShortUrl.getValue().isDeleted) {
+      throw new ShortURLDoesNotExistsError();
     }
 
     return foundShortUrl.getValue().longUrl.value;
+  }
+
+  async delete(clientId: string, shortUrlId: string): Promise<void> {
+    const clientFound = await this.clientRepo.findById(
+      UUIDValueObject.tryToCreate(clientId),
+    );
+    if (!clientFound) {
+      throw new AccountDoesNotExistsError();
+    }
+
+    const foundShortUrl = await this.ShortUrlRepo.findById(
+      IDValueObject.createAndValidateCustom(
+        ID_TYPE.INCREMENTAL_BASE36,
+        shortUrlId,
+      ),
+    );
+
+    if (!foundShortUrl || foundShortUrl.getValue().isDeleted) {
+      throw new ShortURLDoesNotExistsError();
+    }
+
+    clientFound.confirmLinkDeletion();
+    foundShortUrl.markAsDeleted();
+
+    await this.ShortUrlRepo.delete(foundShortUrl);
   }
 }

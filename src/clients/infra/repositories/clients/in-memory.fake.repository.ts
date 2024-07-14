@@ -23,7 +23,8 @@ export class FakeInMemoryClientsRepository implements IClientRepository {
           PlanEntity.create({
             id: '5532b773-be2f-42e5-a4da-a0856bf0d62c',
             tier: PLAN_TYPES.FREE,
-            durationInMilliseconds: 3600000,
+            linksCreationRechargeTime: 3600000,
+            linksDeletionRechargeTime: 3600000,
           }),
         ],
       );

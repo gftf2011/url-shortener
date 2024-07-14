@@ -8,14 +8,17 @@ export enum PLAN_TYPES {
 type Props = {
   id: string;
   tier: PLAN_TYPES;
-  durationInMilliseconds: number;
+  linksCreationRechargeTime: number;
+  linksDeletionRechargeTime: number;
 };
 
 type Value = {
   id: UUIDValueObject;
   tier: PLAN_TYPES;
-  quota: number;
-  durationInMilliseconds: number;
+  linksCreationQuota: number;
+  linksCreationRechargeTime: number;
+  linksDeletionQuota: number;
+  linksDeletionRechargeTime: number;
 };
 
 export type PlanID = UUIDValueObject;
@@ -25,40 +28,49 @@ export class PlanEntity extends Entity {
 
   private tier: PLAN_TYPES;
 
-  private quota: number;
+  private linksDeletionQuota: number;
 
-  private durationInMilliseconds: number;
+  private linksCreationQuota: number;
+
+  private linksCreationRechargeTime: number;
+
+  private linksDeletionRechargeTime: number;
 
   private constructor(protected readonly props: Props) {
     super();
     this.id = UUIDValueObject.tryToCreate(props.id);
     this.tier = props.tier;
-    this.quota = PlanEntity.quotasByTier(props.tier);
-    this.durationInMilliseconds = props.durationInMilliseconds;
+    this.linksCreationQuota = PlanEntity.quotasByTier(props.tier)[0];
+    this.linksDeletionQuota = PlanEntity.quotasByTier(props.tier)[1];
+    this.linksCreationRechargeTime = props.linksCreationRechargeTime;
+    this.linksDeletionRechargeTime = props.linksDeletionRechargeTime;
   }
 
   static create({
     id,
     tier,
-    durationInMilliseconds,
+    linksCreationRechargeTime,
+    linksDeletionRechargeTime,
   }: {
     id: string;
     tier: PLAN_TYPES;
-    durationInMilliseconds: number;
+    linksCreationRechargeTime: number;
+    linksDeletionRechargeTime: number;
   }): PlanEntity {
     return new PlanEntity({
       id,
       tier,
-      durationInMilliseconds,
+      linksCreationRechargeTime,
+      linksDeletionRechargeTime,
     });
   }
 
-  private static quotasByTier(tier: PLAN_TYPES): number {
+  private static quotasByTier(tier: PLAN_TYPES): [number, number] {
     switch (tier) {
       case PLAN_TYPES.FREE:
-        return 2;
+        return [2, 2];
       default:
-        return 2;
+        return [2, 2];
     }
   }
 
@@ -66,8 +78,10 @@ export class PlanEntity extends Entity {
     return {
       id: this.id,
       tier: this.tier,
-      quota: this.quota,
-      durationInMilliseconds: this.durationInMilliseconds,
+      linksCreationQuota: this.linksCreationQuota,
+      linksCreationRechargeTime: this.linksCreationRechargeTime,
+      linksDeletionQuota: this.linksDeletionQuota,
+      linksDeletionRechargeTime: this.linksDeletionRechargeTime,
     };
   }
 }

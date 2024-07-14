@@ -1,4 +1,3 @@
-import { UUIDValueObject } from '../../../../clients/domain/value-objects';
 import { ShortUrlEntity } from '../../entities';
 import { IDValueObject } from '../../value-objects';
 
@@ -15,10 +14,15 @@ export type IIncreaseLastIdShortUrlRepository = {
 };
 
 export type IFindByIdShortUrlRepository = {
-  findById(shortUrlId: IDValueObject): Promise<ShortUrlEntity>;
+  findById: (shortUrlId: IDValueObject) => Promise<ShortUrlEntity>;
+};
+
+export type IDeleteShortUrlRepository = {
+  delete: (entity: ShortUrlEntity) => Promise<void>;
 };
 
 export type IShortUrlRepository = IGetLastIdShortUrlRepository &
   ISaveShortUrlRepository &
   IIncreaseLastIdShortUrlRepository &
-  IFindByIdShortUrlRepository;
+  IFindByIdShortUrlRepository &
+  IDeleteShortUrlRepository;

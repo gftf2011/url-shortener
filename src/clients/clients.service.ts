@@ -31,7 +31,8 @@ export class ClientsService implements IClientService {
       password: input.password,
       planId: freePlan.getValue().id.value,
       planTier: freePlan.getValue().tier,
-      quotaDuration: freePlan.getValue().durationInMilliseconds,
+      planCreateRechargeTime: freePlan.getValue().linksCreationRechargeTime,
+      planDeleteRechargeTime: freePlan.getValue().linksDeletionRechargeTime,
     });
 
     const foundClient = await this.clientRepo.findByEmail(

@@ -24,12 +24,14 @@ export class MySqlClientsRepository implements IClientRepository {
     ];
 
     const command2 =
-      'INSERT INTO clients_schema.quota (client_id, plan_id, quota, refresh_in) VALUES (?, ?, ?, ?);';
+      'INSERT INTO clients_schema.quota (client_id, plan_id, quota_remaining_creation_links, quota_remaining_deletion_links, plan_create_recharge_time_refreshes_in, plan_delete_recharge_time_refreshes_in) VALUES (?, ?, ?, ?, ?, ?);';
     const values2 = [
       entity.getValue().id.value,
       entity.getValue().plan.getValue().id.value,
-      entity.getValue().linksQuota,
-      entity.getValue().quotaRefreshIn.getTime(),
+      entity.getValue().linksCreationQuota,
+      entity.getValue().linksDeletionQuota,
+      entity.getValue().planCreateRechargeTimeRefreshesIn.getTime(),
+      entity.getValue().planDeleteRechargeTimeRefreshesIn.getTime(),
     ];
 
     await (this.db as mysql.PoolConnection).query(command1, values1);
@@ -72,9 +74,14 @@ export class MySqlClientsRepository implements IClientRepository {
       password: clientRows[0].password,
       fullName: clientRows[0].full_name,
       planId: clientPlanRows[0].plan_id,
-      linksQuota: clientPlanRows[0].quota,
-      quotaRefreshIn: clientPlanRows[0].refresh_in,
-      quotaDuration: planRows[0].duration,
+      linksCreationQuota: clientPlanRows[0].quota_remaining_creation_links,
+      linksDeletionQuota: clientPlanRows[0].quota_remaining_deletion_links,
+      planCreateRechargeTimeRefreshesIn:
+        clientPlanRows[0].plan_create_recharge_time_refreshes_in,
+      planDeleteRechargeTimeRefreshesIn:
+        clientPlanRows[0].plan_delete_recharge_time_refreshes_in,
+      planCreateRechargeTime: planRows[0].create_recharge_time,
+      planDeleteRechargeTime: planRows[0].delete_recharge_time,
       planTier: PLAN_TYPES[planRows[0].tier],
     });
   }
@@ -88,7 +95,8 @@ export class MySqlClientsRepository implements IClientRepository {
     );
 
     return PlanEntity.create({
-      durationInMilliseconds: rows[0].duration,
+      linksCreationRechargeTime: rows[0].create_recharge_time,
+      linksDeletionRechargeTime: rows[0].delete_recharge_time,
       tier: rows[0].tier,
       id: rows[0].id,
     });
@@ -129,9 +137,14 @@ export class MySqlClientsRepository implements IClientRepository {
       password: clientRows[0].password,
       fullName: clientRows[0].full_name,
       planId: clientPlanRows[0].plan_id,
-      linksQuota: clientPlanRows[0].quota,
-      quotaRefreshIn: clientPlanRows[0].refresh_in,
-      quotaDuration: planRows[0].duration,
+      linksCreationQuota: clientPlanRows[0].quota_remaining_creation_links,
+      linksDeletionQuota: clientPlanRows[0].quota_remaining_deletion_links,
+      planCreateRechargeTimeRefreshesIn:
+        clientPlanRows[0].plan_create_recharge_time_refreshes_in,
+      planDeleteRechargeTimeRefreshesIn:
+        clientPlanRows[0].plan_delete_recharge_time_refreshes_in,
+      planCreateRechargeTime: planRows[0].create_recharge_time,
+      planDeleteRechargeTime: planRows[0].delete_recharge_time,
       planTier: PLAN_TYPES[planRows[0].tier],
     });
   }
@@ -150,11 +163,13 @@ export class MySqlClientsRepository implements IClientRepository {
     await (this.db as mysql.PoolConnection).query(command1, values1);
 
     const command2 =
-      'UPDATE clients_schema.quota SET plan_id = ?, quota = ?, refresh_in = ? WHERE client_id = ?;';
+      'UPDATE clients_schema.quota SET plan_id = ?, quota_remaining_creation_links = ?, quota_remaining_deletion_links = ?, plan_create_recharge_time_refreshes_in = ?, plan_delete_recharge_time_refreshes_in = ? WHERE client_id = ?;';
     const values2 = [
       entity.getValue().plan.getValue().id.value,
-      entity.getValue().linksQuota,
-      entity.getValue().quotaRefreshIn.getTime(),
+      entity.getValue().linksCreationQuota,
+      entity.getValue().linksDeletionQuota,
+      entity.getValue().planCreateRechargeTimeRefreshesIn.getTime(),
+      entity.getValue().planDeleteRechargeTimeRefreshesIn.getTime(),
       entity.getValue().id.value,
     ];
 

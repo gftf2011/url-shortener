@@ -41,3 +41,10 @@ Authorization: {{accessToken}}
 # @name redirect
 GET {{url}}/{{shortLink}}
 Content-Type: application/json
+
+###
+
+# @name deleteUrl
+DELETE {{url}}/{{shortLink}}
+Content-Type: application/json
+Authorization: {{accessToken}}

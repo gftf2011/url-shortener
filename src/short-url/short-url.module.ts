@@ -15,7 +15,10 @@ import {
 import { UnitOfWorkDecorator } from './unit-of-work';
 import { RedisDBConnection } from '../common/infra/databases/redis/connection';
 import { RedisTransaction } from '../common/infra/databases/redis/transaction';
-import { CacheShortUrlOnFindByIdDecorator } from './infra/repositories/short-url/decorators';
+import {
+  CacheShortUrlOnFindByIdDecorator,
+  DestroyCacheShortUrlOnDeleteDecorator,
+} from './infra/repositories/short-url/decorators';
 
 @Module({
   imports: [ClientsModule],
@@ -45,8 +48,11 @@ import { CacheShortUrlOnFindByIdDecorator } from './infra/repositories/short-url
         mysqlQuery: ISqlDbTransaction,
         redisTransaction: IKeyValueDbTransaction,
       ) => {
-        return new CacheShortUrlOnFindByIdDecorator(
-          new MySqlShortUrlRepository(mysqlQuery),
+        return new DestroyCacheShortUrlOnDeleteDecorator(
+          new CacheShortUrlOnFindByIdDecorator(
+            new MySqlShortUrlRepository(mysqlQuery),
+            redisTransaction,
+          ),
           redisTransaction,
         );
       },

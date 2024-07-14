@@ -35,6 +35,12 @@ export class FakeInMemoryShortUrlRepository implements IShortUrlRepository {
     this.shortUrlsDataCounter.short_urls.last_id = value;
   }
 
+  async delete(entity: ShortUrlEntity): Promise<void> {
+    this.shortUrlsDataRecords = this.shortUrlsDataRecords.filter(
+      (e) => e.getValue().id.value !== entity.getValue().id.value,
+    );
+  }
+
   async getLastId(): Promise<string> {
     return this.shortUrlsDataCounter.short_urls.last_id;
   }

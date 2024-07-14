@@ -7,6 +7,7 @@ type Props = {
   longUrl: string;
   clientId: string;
   createdAt: number;
+  deletedAt?: number;
 };
 
 type Value = {
@@ -14,6 +15,8 @@ type Value = {
   longUrl: URLValueObject;
   clientId: ClientIDValueObject;
   createdAt: Date;
+  deletedAt?: Date;
+  isDeleted: boolean;
 };
 
 export type ShortUrlID = IDValueObject;
@@ -27,6 +30,10 @@ export class ShortUrlEntity extends AggregateRoot {
 
   private createdAt: Date;
 
+  private deletedAt?: Date;
+
+  private isDeleted: boolean = false;
+
   private constructor(protected readonly props: Props) {
     super();
     this.id = IDValueObject.createAndValidateCustom(
@@ -36,6 +43,8 @@ export class ShortUrlEntity extends AggregateRoot {
     this.longUrl = URLValueObject.create(props.longUrl);
     this.clientId = ClientIDValueObject.tryToCreate(props.clientId);
     this.createdAt = new Date(props.createdAt);
+    this.deletedAt = props.deletedAt ? new Date(props.deletedAt) : null;
+    this.isDeleted = props.deletedAt ? true : false;
   }
 
   static createNew({
@@ -55,13 +64,20 @@ export class ShortUrlEntity extends AggregateRoot {
     longUrl,
     clientId,
     createdAt,
+    deletedAt,
   }: {
     id: string;
     longUrl: string;
     clientId: string;
     createdAt: number;
+    deletedAt?: number;
   }): ShortUrlEntity {
-    return new ShortUrlEntity({ id, longUrl, clientId, createdAt });
+    return new ShortUrlEntity({ id, longUrl, clientId, createdAt, deletedAt });
+  }
+
+  public markAsDeleted(): void {
+    this.isDeleted = true;
+    this.deletedAt = new Date();
   }
 
   override getValue(): Value {
@@ -70,6 +86,8 @@ export class ShortUrlEntity extends AggregateRoot {
       longUrl: this.longUrl,
       clientId: this.clientId,
       createdAt: this.createdAt,
+      deletedAt: this.deletedAt,
+      isDeleted: this.isDeleted,
     };
   }
 }

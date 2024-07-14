@@ -14,7 +14,8 @@ type CreateNewArgs = {
   fullName: string;
   planId: string;
   planTier: PLAN_TYPES;
-  quotaDuration: number;
+  planCreateRechargeTime: number;
+  planDeleteRechargeTime: number;
 };
 
 type CreateArgs = {
@@ -24,9 +25,12 @@ type CreateArgs = {
   fullName: string;
   planId: string;
   planTier: PLAN_TYPES;
-  linksQuota: number;
-  quotaRefreshIn: number;
-  quotaDuration: number;
+  linksCreationQuota: number;
+  linksDeletionQuota: number;
+  planCreateRechargeTimeRefreshesIn: number;
+  planDeleteRechargeTimeRefreshesIn: number;
+  planCreateRechargeTime: number;
+  planDeleteRechargeTime: number;
 };
 
 type Props = {
@@ -35,8 +39,10 @@ type Props = {
   password: PasswordValueObject;
   fullName: FullNameValueObject;
   plan: PlanEntity;
-  linksQuota: number;
-  quotaRefreshIn: Date;
+  linksCreationQuota: number;
+  linksDeletionQuota: number;
+  planCreateRechargeTimeRefreshesIn: Date;
+  planDeleteRechargeTimeRefreshesIn: Date;
 };
 
 type Value = {
@@ -45,8 +51,10 @@ type Value = {
   password: PasswordValueObject;
   fullName: FullNameValueObject;
   plan: PlanEntity;
-  linksQuota: number;
-  quotaRefreshIn: Date;
+  linksCreationQuota: number;
+  linksDeletionQuota: number;
+  planCreateRechargeTimeRefreshesIn: Date;
+  planDeleteRechargeTimeRefreshesIn: Date;
 };
 
 export type ClientID = UUIDValueObject;
@@ -62,9 +70,13 @@ export class ClientEntity extends AggregateRoot {
 
   protected plan: PlanEntity;
 
-  protected linksQuota: number;
+  protected linksCreationQuota: number;
 
-  protected quotaRefreshIn: Date;
+  protected linksDeletionQuota: number;
+
+  protected planCreateRechargeTimeRefreshesIn: Date;
+
+  protected planDeleteRechargeTimeRefreshesIn: Date;
 
   protected constructor(props: Props) {
     super();
@@ -73,8 +85,12 @@ export class ClientEntity extends AggregateRoot {
     this.password = props.password;
     this.fullName = props.fullName;
     this.plan = props.plan;
-    this.linksQuota = props.linksQuota;
-    this.quotaRefreshIn = props.quotaRefreshIn;
+    this.linksCreationQuota = props.linksCreationQuota;
+    this.linksDeletionQuota = props.linksDeletionQuota;
+    this.planCreateRechargeTimeRefreshesIn =
+      props.planCreateRechargeTimeRefreshesIn;
+    this.planDeleteRechargeTimeRefreshesIn =
+      props.planDeleteRechargeTimeRefreshesIn;
   }
 
   public static async createNew(args: CreateNewArgs): Promise<ClientEntity> {
@@ -89,10 +105,14 @@ export class ClientEntity extends AggregateRoot {
     const plan = PlanEntity.create({
       id: args.planId,
       tier: args.planTier,
-      durationInMilliseconds: args.quotaDuration,
+      linksCreationRechargeTime: args.planCreateRechargeTime,
+      linksDeletionRechargeTime: args.planDeleteRechargeTime,
     });
-    const linksQuota = plan.getValue().quota;
-    const quotaRefreshIn = timestamp;
+    const linksCreationQuota = plan.getValue().linksCreationQuota;
+    const planCreateRechargeTimeRefreshesIn = timestamp;
+
+    const linksDeletionQuota = plan.getValue().linksDeletionQuota;
+    const planDeleteRechargeTimeRefreshesIn = timestamp;
 
     return new ClientEntity({
       id,
@@ -100,8 +120,10 @@ export class ClientEntity extends AggregateRoot {
       password,
       fullName,
       plan,
-      linksQuota,
-      quotaRefreshIn,
+      linksCreationQuota,
+      linksDeletionQuota,
+      planDeleteRechargeTimeRefreshesIn,
+      planCreateRechargeTimeRefreshesIn,
     });
   }
 
@@ -113,10 +135,17 @@ export class ClientEntity extends AggregateRoot {
     const plan = PlanEntity.create({
       id: args.planId,
       tier: args.planTier,
-      durationInMilliseconds: args.quotaDuration,
+      linksCreationRechargeTime: args.planCreateRechargeTime,
+      linksDeletionRechargeTime: args.planDeleteRechargeTime,
     });
-    const linksQuota = args.linksQuota;
-    const quotaRefreshIn = new Date(args.quotaRefreshIn);
+    const linksCreationQuota = args.linksCreationQuota;
+    const linksDeletionQuota = args.linksDeletionQuota;
+    const planCreateRechargeTimeRefreshesIn = new Date(
+      args.planCreateRechargeTimeRefreshesIn,
+    );
+    const planDeleteRechargeTimeRefreshesIn = new Date(
+      args.planDeleteRechargeTimeRefreshesIn,
+    );
 
     return new ClientEntity({
       id,
@@ -124,25 +153,45 @@ export class ClientEntity extends AggregateRoot {
       password,
       fullName,
       plan,
-      linksQuota,
-      quotaRefreshIn,
+      linksCreationQuota,
+      linksDeletionQuota,
+      planCreateRechargeTimeRefreshesIn,
+      planDeleteRechargeTimeRefreshesIn,
     });
   }
 
   public confirmLinkCreation(): void {
     const now = new Date();
-    if (now.getTime() - this.quotaRefreshIn.getTime() >= 3600000) {
-      this.linksQuota = this.plan.getValue().quota;
-      this.quotaRefreshIn = now;
+    if (
+      now.getTime() - this.planCreateRechargeTimeRefreshesIn.getTime() >=
+      this.plan.getValue().linksCreationRechargeTime
+    ) {
+      this.linksCreationQuota = this.plan.getValue().linksCreationQuota;
+      this.planCreateRechargeTimeRefreshesIn = now;
     }
-    if (this.linksQuota === 0) {
+    if (this.linksCreationQuota === 0) {
       throw new ExceededLinksQuotaError();
     }
-    this.linksQuota--;
+    this.linksCreationQuota--;
+  }
+
+  public confirmLinkDeletion(): void {
+    const now = new Date();
+    if (
+      now.getTime() - this.planDeleteRechargeTimeRefreshesIn.getTime() >=
+      this.plan.getValue().linksDeletionRechargeTime
+    ) {
+      this.linksDeletionQuota = this.plan.getValue().linksDeletionQuota;
+      this.planDeleteRechargeTimeRefreshesIn = now;
+    }
+    if (this.linksDeletionQuota === 0) {
+      throw new ExceededLinksQuotaError();
+    }
+    this.linksDeletionQuota--;
   }
 
   public async checkPasswordMatch(password: string): Promise<void> {
-    if (!await this.password.compare(password)) {
+    if (!(await this.password.compare(password))) {
       throw new PasswordDoesNotMatchError();
     }
   }
@@ -154,8 +203,10 @@ export class ClientEntity extends AggregateRoot {
       fullName: this.fullName,
       id: this.id,
       plan: this.plan,
-      linksQuota: this.linksQuota,
-      quotaRefreshIn: this.quotaRefreshIn,
+      linksCreationQuota: this.linksCreationQuota,
+      linksDeletionQuota: this.linksDeletionQuota,
+      planCreateRechargeTimeRefreshesIn: this.planCreateRechargeTimeRefreshesIn,
+      planDeleteRechargeTimeRefreshesIn: this.planDeleteRechargeTimeRefreshesIn,
     };
   }
 }

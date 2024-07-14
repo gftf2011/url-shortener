@@ -1,4 +1,12 @@
-import { Controller, Get, Inject, Post, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { IShortUrlService } from './contracts/services';
 import { AccountDoesNotExistsError } from '../clients/errors';
@@ -8,13 +16,13 @@ import {
   InvalidURLFormatError,
   InvalidURLTooLongError,
 } from './domain/errors';
-import { ShortURLDoesExistsError } from './errors';
+import { ShortURLDoesNotExistsError } from './errors';
 
 @Controller()
 export class ShortUrlController {
   constructor(
     @Inject('IShortUrlService')
-    private readonly ShortUrlService: IShortUrlService,
+    private readonly shortUrlService: IShortUrlService,
   ) {}
 
   @Post()
@@ -23,7 +31,7 @@ export class ShortUrlController {
     @Res() res: Response,
   ): Promise<Response<any, Record<string, any>>> {
     try {
-      const response = await this.ShortUrlService.create(
+      const response = await this.shortUrlService.create(
         req.body.longUrl,
         req.headers['clientId'] as string,
       );
@@ -52,14 +60,40 @@ export class ShortUrlController {
     @Res() res: Response,
   ): Promise<any> {
     try {
-      const response = await this.ShortUrlService.get(req.params.id);
+      const response = await this.shortUrlService.get(req.params.id);
       res.redirect(response);
     } catch (e: any) {
       const error: Error = e;
       if (error.name === InvalidIDError.name) {
         return res.status(400).json({ error: error.message });
       }
-      if (error.name === ShortURLDoesExistsError.name) {
+      if (error.name === ShortURLDoesNotExistsError.name) {
+        return res.status(404).json({ error: error.message });
+      }
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  @Delete(':id')
+  async delete(
+    @Req() req: Request<{ id: string }, any, any, any, any>,
+    @Res() res: Response,
+  ): Promise<any> {
+    try {
+      await this.shortUrlService.delete(
+        req.headers['clientId'] as string,
+        req.params.id,
+      );
+      return res.status(204).end();
+    } catch (e: any) {
+      const error: Error = e;
+      if (error.name === AccountDoesNotExistsError.name) {
+        return res.status(401).json({ error: error.message });
+      }
+      if (error.name === ExceededLinksQuotaError.name) {
+        return res.status(403).json({ error: error.message });
+      }
+      if (error.name === ShortURLDoesNotExistsError.name) {
         return res.status(404).json({ error: error.message });
       }
       return res.status(500).json({ error: error.message });

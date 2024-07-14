@@ -21,6 +21,7 @@ export class MySqlShortUrlRepository implements IShortUrlRepository {
       longUrl: rows[0].long_url,
       id: rows[0].id,
       createdAt: rows[0].created_at,
+      deletedAt: rows[0].deleted_at,
     });
   }
 
@@ -32,6 +33,18 @@ export class MySqlShortUrlRepository implements IShortUrlRepository {
       entity.getValue().clientId.value,
       entity.getValue().longUrl.value,
       entity.getValue().createdAt.getTime(),
+    ];
+
+    await (this.db as mysql.PoolConnection).query(command, values);
+  }
+
+  async delete(entity: ShortUrlEntity): Promise<void> {
+    const command =
+      'UPDATE short_urls_schema.short_urls SET is_deleted = ?, deleted_at = ? WHERE id = ?;';
+    const values = [
+      entity.getValue().isDeleted,
+      entity.getValue().deletedAt!.getTime(),
+      entity.getValue().id.value,
     ];
 
     await (this.db as mysql.PoolConnection).query(command, values);

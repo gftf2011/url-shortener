@@ -3,34 +3,30 @@ import { IShortUrlRepository } from '../../../../domain/repositories/redirect-ur
 import { IKeyValueDbTransaction } from '../../../../../common/app/contracts/databases';
 import { IDValueObject } from '../../../../domain/value-objects';
 
-export class CacheShortUrlOnFindByIdDecorator implements IShortUrlRepository {
+export class DestroyCacheShortUrlOnDeleteDecorator
+  implements IShortUrlRepository
+{
   constructor(
     private readonly repo: IShortUrlRepository,
     private readonly db: IKeyValueDbTransaction,
   ) {}
 
   async findById(shortUrlId: IDValueObject): Promise<ShortUrlEntity> {
-    const entity = await this.repo.findById(shortUrlId);
+    return this.repo.findById(shortUrlId);
+  }
+
+  async delete(entity: ShortUrlEntity): Promise<void> {
+    await this.repo.delete(entity);
     /**
      * Failover approach avoid crashing the application allowing the cache handling
      */
     try {
       await this.db.createClient();
-      await this.db.set(
-        entity.getValue().id.value,
-        entity.getValue().longUrl.value,
-        { ttl_in_milliseconds: 3600000 },
-      );
-      await this.db.release();
-    } catch (e) {
       await this.db.del(entity.getValue().id.value);
       await this.db.release();
+    } catch (e) {
+      await this.db.release();
     }
-    return entity;
-  }
-
-  async delete(entity: ShortUrlEntity): Promise<void> {
-    await this.repo.delete(entity);
   }
 
   async save(entity: ShortUrlEntity): Promise<void> {
