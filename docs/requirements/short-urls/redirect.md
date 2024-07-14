@@ -2,7 +2,7 @@
 
 > ## Success Case
 
-1.  ✅ Receives **GET** request at route **/**
+1.  ✅ Receives **GET** request at route **/:id**
 2.  ✅ Validates required field **id**
 3.  ✅ Checks if short-url already exists
 4.  ✅ Retrieves short-url from database AND saves short-url response in cache

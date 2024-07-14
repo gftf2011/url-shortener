@@ -3,13 +3,14 @@
 > ## Success Case
 
 1.  ✅ Receives **Post** request at route **/**
-2.  ✅ Checks if client with given id already exists
-3.  ✅ Validates if **longUrl** is valid
-4.  ✅ Get the last id from last short-url created
-5.  ✅ Increments the last id
-6.  ✅ **Creates** the short-url in the database
-7.  ✅ Decreases the 'creation link quota' from the client based on it's plan
-8.  ✅ Returns **201** status code and **id** from short-url created
+2.  ✅ Validates if **authorization** header is valid
+3.  ✅ Checks if client do exists
+4.  ✅ Validates if **longUrl** is valid
+5.  ✅ Get the last id from last short-url created
+6.  ✅ Increments the last id
+7.  ✅ **Creates** the short-url in the database
+8.  ✅ Decreases the 'creation link quota' from the client based on it's plan
+9.  ✅ Returns **201** status code and **id** from short-url created
 
 > ## Error Case
 
