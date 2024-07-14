@@ -26,7 +26,7 @@ export class ShortUrlController {
   ) {}
 
   @Post()
-  async create(
+  async createShortUrl(
     @Req() req: Request<any, any, { longUrl: string }, any, any>,
     @Res() res: Response,
   ): Promise<Response<any, Record<string, any>>> {
@@ -75,7 +75,7 @@ export class ShortUrlController {
   }
 
   @Delete(':id')
-  async delete(
+  async deleteShortUrl(
     @Req() req: Request<{ id: string }, any, any, any, any>,
     @Res() res: Response,
   ): Promise<any> {

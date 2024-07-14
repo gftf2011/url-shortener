@@ -10,10 +10,10 @@
     2. 1 lowercase letter
     3. 1 uppercase letter
     4. 1 special character - (^!@#$%&?)
-5.  ✅ Checks if user with given email already exists
-6.  ✅ User email is checked with the one in database
-7.  ✅ User password is again **hashed** to check with the one in database
-8.  ✅ Checks if user password matches with the one in database
+5.  ✅ Checks if client with given email already exists
+6.  ✅ Client email is checked with the one in database
+7.  ✅ Client password is again **hashed** to check with the one in database
+8.  ✅ Checks if client password matches with the one in database
 9.  ✅ Creates **access-token** using code retrieved ID
 10. ✅ Returns **200** status code with **access-token**
 

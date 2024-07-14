@@ -1,4 +1,4 @@
-# Login - Business Rule
+# Redirect - Business Rule
 
 > ## Success Case
 
