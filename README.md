@@ -20,6 +20,7 @@
   <a href="#hammer_and_wrench-supported-os">Supported OS</a> • 
   <a href="#large_blue_diamond-design-patterns">Design Patterns</a> •
   <a href="#blue_book-principles">Principles</a> •
+  <a href="#orange_book-adrs-architecture-decision-records">ADRs</a> •
   <a href="#clipboard-required-tools">Required Tools</a> •
   <a href="#racing_car-running-project">Running Project</a> •
   <a href="#memo-license">License</a>
@@ -68,6 +69,13 @@ The objective from this project was to explore the framework by creating a well 
 - [You Aren't Gonna Need It (YAGNI)](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it)
 - [Keep It Simple, Stupid (KISS)](https://en.wikipedia.org/wiki/KISS_principle)
 - [Composition Over Inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance)
+
+<br/>
+
+## :orange_book: ADRs - Architecture Decision Records
+
+- ['Short URL' ID Definition](https://github.com/gftf2011/url-shortener/tree/main/docs/ADRs/short-url-id-definition.md)
+- [Soft Delete](https://github.com/gftf2011/url-shortener/tree/main/docs/ADRs/soft-delete.md)
 
 <br/>
 
