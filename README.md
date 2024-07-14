@@ -20,6 +20,7 @@
   <a href="#hammer_and_wrench-supported-os">Supported OS</a> • 
   <a href="#large_blue_diamond-design-patterns">Design Patterns</a> •
   <a href="#blue_book-principles">Principles</a> •
+  <a href="#building_construction-business-rules">Business Rules</a> •
   <a href="#orange_book-adrs---architecture-decision-records">ADRs</a> •
   <a href="#clipboard-required-tools">Required Tools</a> •
   <a href="#racing_car-running-project">Running Project</a> •
@@ -72,6 +73,19 @@ The objective from this project was to explore the framework by creating a well 
 
 <br/>
 
+## :building_construction: Business Rules
+
+- **Clients**
+  - [Create Account](https://github.com/gftf2011/url-shrtener/tree/main/docs/requirements/clients/create-account.md)
+  - [Login](https://github.com/gftf2011/url-shrtener/tree/main/docs/requirements/clients/login.md)
+
+- **Short URLs**
+  - [Redirect](https://github.com/gftf2011/url-shrtener/tree/main/docs/requirements/short-urls/redirect.md)
+  - [Create Short URL](https://github.com/gftf2011/url-shrtener/tree/main/docs/requirements/short-urls/create-short-url.md)
+  - [Delete Short URL](https://github.com/gftf2011/url-shrtener/tree/main/docs/requirements/short-urls/delete-short-url.md)
+
+<br/>
+
 ## :orange_book: ADRs - Architecture Decision Records
 
 - ['Short URL' ID Definition](https://github.com/gftf2011/url-shortener/tree/main/docs/ADRs/short-url-id-definition.md)
@@ -92,17 +106,21 @@ The objective from this project was to explore the framework by creating a well 
 
 ## :racing_car: Running Project
 
-DEVELOPMENT
+**DEVELOPMENT**
+
 ```sh
   $ npm i
   $ npm run start:dev
 ```
 
-DEBUG
+**DEBUG**
+
 ```sh
   $ npm i
   $ npm run start:debug
 ```
+
+OBS.: After the server is UP and Running use __api.http__ file to do your requests using **VS Code**
 
 <br/>
 
