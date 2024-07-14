@@ -1,8 +1,8 @@
 {
   "name": "url-shortener",
   "version": "1.0.0",
-  "description": "",
-  "author": "",
+  "description": "TinyURL Backend CLONE made with Nest.Js, built with Clean Architecture using Design Patterns and D.D.D. that runs in REST a server",
+  "author": "Gabriel Ferrari Tarallo Ferraz",
   "private": true,
   "license": "MIT",
   "scripts": {
