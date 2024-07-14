@@ -1,4 +1,4 @@
-# Create Short Url - Business Rule
+# Delete Short Url - Business Rule
 
 > ## Success Case
 
