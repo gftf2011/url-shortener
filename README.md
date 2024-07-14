@@ -91,6 +91,7 @@ The objective from this project was to explore the framework by creating a well 
 - ['Short URL' ID Definition](https://github.com/gftf2011/url-shortener/tree/main/docs/ADRs/short-url-id-definition.md)
 - [Soft Delete](https://github.com/gftf2011/url-shortener/tree/main/docs/ADRs/soft-delete.md)
 - [MySQL Core Databse](https://github.com/gftf2011/url-shortener/tree/main/docs/ADRs/mysql-core-database.md)
+- [LRU Cache](https://github.com/gftf2011/url-shortener/tree/main/docs/ADRs/lru-cache.md)
 
 <br/>
 
