@@ -58,6 +58,50 @@ describe('Client - Entity', () => {
     );
   });
 
+  it('should return a "Client" that already exists with valid parameters', () => {
+    const fullName = 'Adolfo Oliveira';
+    const planCreateRechargeTime = Date.now();
+    const planDeleteRechargeTime = Date.now();
+
+    const entity = ClientEntity.create({
+      id: '4132e2a3-5914-4226-bec5-d5cbbdaea902',
+      email: 'test@mail.com',
+      fullName,
+      password: 'hashed_password',
+      planCreateRechargeTime,
+      planDeleteRechargeTime,
+      planTier: PLAN_TYPES.FREE,
+      planId: '4132e2a3-5914-4226-bec5-d5cbbdaea903',
+      linksCreationQuota: 1,
+      linksDeletionQuota: 1,
+      planCreateRechargeTimeRefreshesIn: 0,
+      planDeleteRechargeTimeRefreshesIn: 0,
+    });
+
+    expect(entity.getValue().email.value).toBe('test@mail.com');
+    expect(entity.getValue().fullName.value).toBe(fullName.toLowerCase());
+    expect(entity.getValue().id.value).toBe(
+      '4132e2a3-5914-4226-bec5-d5cbbdaea902',
+    );
+    expect(entity.getValue().linksCreationQuota).toBe(1);
+    expect(entity.getValue().linksDeletionQuota).toBe(1);
+    expect(entity.getValue().password.value).toBe('hashed_password');
+    expect(entity.getValue().plan.getValue().id.value).toBe(
+      '4132e2a3-5914-4226-bec5-d5cbbdaea903',
+    );
+    expect(entity.getValue().plan.getValue().linksCreationQuota).toBe(2);
+    expect(entity.getValue().plan.getValue().linksCreationRechargeTime).toBe(0);
+    expect(entity.getValue().plan.getValue().linksDeletionQuota).toBe(2);
+    expect(entity.getValue().plan.getValue().linksDeletionRechargeTime).toBe(0);
+    expect(entity.getValue().plan.getValue().tier).toBe(PLAN_TYPES.FREE);
+    expect(entity.getValue().planCreateRechargeTimeRefreshesIn.getTime()).toBe(
+      planCreateRechargeTime,
+    );
+    expect(entity.getValue().planDeleteRechargeTimeRefreshesIn.getTime()).toBe(
+      planDeleteRechargeTime,
+    );
+  });
+
   afterAll(() => {
     /**
      * Most important - restores module to original implementation

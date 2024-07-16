@@ -127,7 +127,7 @@ export class ClientEntity extends AggregateRoot {
     });
   }
 
-  public static async create(args: CreateArgs): Promise<ClientEntity> {
+  public static create(args: CreateArgs): ClientEntity {
     const id = UUIDValueObject.tryToCreate(args.id);
     const email = EmailValueObject.create(args.email);
     const password = PasswordValueObject.create(args.password);
