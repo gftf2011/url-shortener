@@ -5,6 +5,14 @@ import { PLAN_TYPES } from './plan.entity';
 jest.mock('bcrypt');
 
 describe('Client - Entity', () => {
+  beforeEach(() => {
+    /**
+     * Most important - it clears the cache
+     */
+    jest.clearAllMocks();
+    jest.resetAllMocks();
+  });
+
   it('should return a new "Client" with valid parameters', async () => {
     jest
       .spyOn(bcrypt, 'hash')
@@ -48,5 +56,12 @@ describe('Client - Entity', () => {
     expect(entity.getValue().planDeleteRechargeTimeRefreshesIn.getTime()).toBe(
       planDeleteRechargeTime,
     );
+  });
+
+  afterAll(() => {
+    /**
+     * Most important - restores module to original implementation
+     */
+    jest.restoreAllMocks();
   });
 });
