@@ -113,6 +113,12 @@ describe('Client - Entity', () => {
   });
 
   it('should throw error if "Client" password do not match', async () => {
+    jest
+      .spyOn(bcrypt, 'compare')
+      .mockImplementationOnce((_data: string | Buffer, _encrypted: string) =>
+        Promise.resolve(false),
+      );
+
     const fullName = 'Adolfo Oliveira';
     const planCreateRechargeTime = Date.now();
     const planDeleteRechargeTime = Date.now();
@@ -132,6 +138,34 @@ describe('Client - Entity', () => {
     const promise = async () => await entity.checkPasswordMatch(wrongPasssword);
 
     await expect(promise).rejects.toThrow(new PasswordDoesNotMatchError());
+  });
+
+  it('should match password', async () => {
+    jest
+      .spyOn(bcrypt, 'compare')
+      .mockImplementationOnce((_data: string | Buffer, _encrypted: string) =>
+        Promise.resolve(true),
+      );
+
+    const fullName = 'Adolfo Oliveira';
+    const planCreateRechargeTime = Date.now();
+    const planDeleteRechargeTime = Date.now();
+
+    const rightPassword = '12345678xX#';
+
+    const entity = await ClientEntity.createNew({
+      email: 'test@mail.com',
+      fullName,
+      password: '12345678xX#',
+      planCreateRechargeTime,
+      planDeleteRechargeTime,
+      planTier: PLAN_TYPES.FREE,
+      planId: '4132e2a3-5914-4226-bec5-d5cbbdaea903',
+    });
+
+    const response = await entity.checkPasswordMatch(rightPassword);
+
+    expect(response).toBeUndefined();
   });
 
   it('should confirm link creation', async () => {
