@@ -143,7 +143,6 @@ export class ClientEntity extends AggregateRoot {
     const planCreateRechargeTimeRefreshesIn = new Date(
       args.planCreateRechargeTimeRefreshesIn,
     );
-    console.log(planCreateRechargeTimeRefreshesIn.getTime());
     const planDeleteRechargeTimeRefreshesIn = new Date(
       args.planDeleteRechargeTimeRefreshesIn,
     );

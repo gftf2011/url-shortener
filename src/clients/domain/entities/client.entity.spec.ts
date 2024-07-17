@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { ClientEntity } from './client.entity';
 import { PLAN_TYPES } from './plan.entity';
-import { PasswordDoesNotMatchError } from '../errors';
+import { ExceededLinksQuotaError, PasswordDoesNotMatchError } from '../errors';
 
 jest.mock('bcrypt');
 
@@ -134,10 +134,97 @@ describe('Client - Entity', () => {
     await expect(promise).rejects.toThrow(new PasswordDoesNotMatchError());
   });
 
+  it('should confirm link creation', async () => {
+    const fullName = 'Adolfo Oliveira';
+    const planCreateRechargeTime = Date.now();
+    const planDeleteRechargeTime = Date.now();
+
+    const entity = await ClientEntity.createNew({
+      email: 'test@mail.com',
+      fullName,
+      password: '12345678xX#',
+      planCreateRechargeTime,
+      planDeleteRechargeTime,
+      planTier: PLAN_TYPES.FREE,
+      planId: '4132e2a3-5914-4226-bec5-d5cbbdaea903',
+    });
+
+    entity.confirmLinkCreation();
+
+    expect(entity.getValue().linksCreationQuota).toBe(1);
+  });
+
+  it('should throw error if "Client" has no more link creation quotas', async () => {
+    const fullName = 'Adolfo Oliveira';
+    const planCreateRechargeTime = Date.now();
+    const planDeleteRechargeTime = Date.now();
+
+    const entity = await ClientEntity.createNew({
+      email: 'test@mail.com',
+      fullName,
+      password: '12345678xX#',
+      planCreateRechargeTime,
+      planDeleteRechargeTime,
+      planTier: PLAN_TYPES.FREE,
+      planId: '4132e2a3-5914-4226-bec5-d5cbbdaea903',
+    });
+
+    entity.confirmLinkCreation();
+    entity.confirmLinkCreation();
+
+    const error = () => entity.confirmLinkCreation();
+
+    expect(error).toThrow(new ExceededLinksQuotaError());
+  });
+
+  it('should confirm link deletion', async () => {
+    const fullName = 'Adolfo Oliveira';
+    const planCreateRechargeTime = Date.now();
+    const planDeleteRechargeTime = Date.now();
+
+    const entity = await ClientEntity.createNew({
+      email: 'test@mail.com',
+      fullName,
+      password: '12345678xX#',
+      planCreateRechargeTime,
+      planDeleteRechargeTime,
+      planTier: PLAN_TYPES.FREE,
+      planId: '4132e2a3-5914-4226-bec5-d5cbbdaea903',
+    });
+
+    entity.confirmLinkDeletion();
+
+    expect(entity.getValue().linksDeletionQuota).toBe(1);
+  });
+
+  it('should throw error if "Client" has no more link deletion quotas', async () => {
+    const fullName = 'Adolfo Oliveira';
+    const planCreateRechargeTime = Date.now();
+    const planDeleteRechargeTime = Date.now();
+
+    const entity = await ClientEntity.createNew({
+      email: 'test@mail.com',
+      fullName,
+      password: '12345678xX#',
+      planCreateRechargeTime,
+      planDeleteRechargeTime,
+      planTier: PLAN_TYPES.FREE,
+      planId: '4132e2a3-5914-4226-bec5-d5cbbdaea903',
+    });
+
+    entity.confirmLinkDeletion();
+    entity.confirmLinkDeletion();
+
+    const error = () => entity.confirmLinkDeletion();
+
+    expect(error).toThrow(new ExceededLinksQuotaError());
+  });
+
   afterAll(() => {
     /**
      * Most important - restores module to original implementation
      */
     jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 });
