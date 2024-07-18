@@ -2,8 +2,6 @@ import { Controller, Inject, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { IClientService } from './contracts/services';
 import { ClientDTO, CredentialsDTO } from './domain/dtos';
-import { DomainError } from '../common/domain';
-import { ApplicationError } from '../common/app/error';
 import { AccountAlreadyExistsError, AccountDoesNotExistsError } from './errors';
 import {
   InvalidEmailError,
