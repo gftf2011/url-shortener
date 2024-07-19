@@ -24,6 +24,7 @@
   <a href="#orange_book-adrs---architecture-decision-records">ADRs</a> •
   <a href="#clipboard-required-tools">Required Tools</a> •
   <a href="#racing_car-running-project">Running Project</a> •
+  <a href="#test_tube-running-tests">Running Tests</a> •
   <a href="#memo-license">License</a>
 </div>
 
@@ -123,6 +124,15 @@ The objective from this project was to explore the framework by creating a well 
 ```
 
 OBS.: After the server is UP and Running use __api.http__ file to do your requests using **VS Code**
+
+<br/>
+
+## :test_tube: Running Tests
+
+> ### Full Test
+```sh
+  $ npm run test
+```
 
 <br/>
 
