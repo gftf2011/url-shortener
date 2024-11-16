@@ -12,7 +12,7 @@
     "build:docker:debug": "rm -rf docker-compose.yml && cat docker/debug/docker-compose.yml >> docker-compose.yml",
     "build:docker:dev": "rm -rf docker-compose.yml && cat docker/dev/docker-compose.yml >> docker-compose.yml",
     "script:exec:debug": "chmod +x ./scripts/debug/mysql/init.sh && chmod 600 ./scripts/debug/mysql/custom.cnf.tpl && chmod 600 ./scripts/debug/redis/redis.conf.tpl",
-    "script:exec:dev": "chmod +x ./scripts/dev/mysql/init.sh && chmod 600 ./scripts/dev/mysql/custom.cnf.tpl && chmod 600 ./scripts/dev/redis/redis.conf.tpl",
+    "script:exec:dev": "chmod +x ./scripts/dev/mysql_main/init.sh && chmod 600 ./scripts/dev/mysql_main/custom.cnf.tpl && chmod +x ./scripts/dev/mysql_worker/init.sh && chmod 600 ./scripts/dev/mysql_worker/custom.cnf.tpl && chmod 600 ./scripts/dev/redis/redis.conf.tpl",
     "build:dev": "rm -rf .env && cat ./envs/dev/.env >> .env",
     "build:debug": "rm -rf .env && cat ./envs/debug/.env >> .env",
     "build": "nest build",

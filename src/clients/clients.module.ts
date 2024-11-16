@@ -59,14 +59,14 @@ import { UnitOfWorkDecorator } from './unit-of-work';
 export class ClientsModule implements OnModuleInit, OnModuleDestroy {
   async onModuleInit(): Promise<void> {
     await MysqlDBConnection.getInstance().connect({
-      connectionLimit: parseInt(process.env.MYSQL_CONN, 10),
+      connectionLimit: parseInt(process.env.MYSQL_CONN_MAIN, 10),
       waitForConnections: true,
       enableKeepAlive: false,
-      user: process.env.MYSQL_USER,
-      port: parseInt(process.env.MYSQL_PORT, 10),
-      database: process.env.MYSQL_DATABASE,
-      host: process.env.MYSQL_HOST,
-      password: process.env.MYSQL_PASSWORD,
+      user: process.env.MYSQL_USER_MAIN,
+      port: parseInt(process.env.MYSQL_PORT_MAIN, 10),
+      database: process.env.MYSQL_DATABASE_MAIN,
+      host: process.env.MYSQL_HOST_MAIN,
+      password: process.env.MYSQL_PASSWORD_MAIN,
     });
   }
 

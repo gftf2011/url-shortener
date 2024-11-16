@@ -19,8 +19,8 @@ ENV MYSQL_CONN=${mysql_conn}
 
 USER root
 
-COPY ./scripts/dev/mysql/custom.cnf.tpl /etc/mysql/custom.cnf.tpl
-COPY ./scripts/dev/mysql/init.sh /docker-entrypoint-initdb.d/init.sh
+COPY ./scripts/dev/mysql_worker/custom.cnf.tpl /etc/mysql/custom.cnf.tpl
+COPY ./scripts/dev/mysql_worker/init.sh /docker-entrypoint-initdb.d/init.sh
 
 RUN apt-get update
 RUN apt-get install -y gettext-base

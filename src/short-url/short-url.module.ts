@@ -5,7 +5,7 @@ import { IShortUrlRepository } from './domain/repositories/redirect-url';
 import { IClientRepository } from '../clients/domain/repositories/clients';
 import { ClientsModule } from 'src/clients/clients.module';
 import { MysqlDBConnection } from '../common/infra/databases/mysql/connection';
-import { MySqlShortUrlRepository } from './infra/repositories/short-url/mysql.repository';
+import { MySqlShortUrlRepository } from './infra/repositories/short-url';
 import { MysqlTransaction } from '../common/infra/databases/mysql/transaction';
 import {
   IDbConnection,
@@ -77,14 +77,14 @@ import {
 export class ShortUrlModule implements OnModuleInit, OnModuleDestroy {
   async onModuleInit(): Promise<void> {
     await MysqlDBConnection.getInstance().connect({
-      connectionLimit: parseInt(process.env.MYSQL_CONN, 10),
+      connectionLimit: parseInt(process.env.MYSQL_CONN_MAIN, 10),
       waitForConnections: true,
       enableKeepAlive: false,
-      user: process.env.MYSQL_USER,
-      port: parseInt(process.env.MYSQL_PORT, 10),
-      database: process.env.MYSQL_DATABASE,
-      host: process.env.MYSQL_HOST,
-      password: process.env.MYSQL_PASSWORD,
+      user: process.env.MYSQL_USER_MAIN,
+      port: parseInt(process.env.MYSQL_PORT_MAIN, 10),
+      database: process.env.MYSQL_DATABASE_MAIN,
+      host: process.env.MYSQL_HOST_MAIN,
+      password: process.env.MYSQL_PASSWORD_MAIN,
     });
 
     await RedisDBConnection.getInstance().connect({

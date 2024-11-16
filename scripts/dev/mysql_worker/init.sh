@@ -2,6 +2,8 @@
 
 set -e
 
+mysql -u ${MYSQL_ROOT_USER} --password="${MYSQL_ROOT_PASSWORD}" ${MYSQL_DATABASE} -e "START GROUP_REPLICATION;"
+
 mysql -u ${MYSQL_ROOT_USER} --password="${MYSQL_ROOT_PASSWORD}" ${MYSQL_DATABASE} -e "CREATE SCHEMA IF NOT EXISTS clients_schema CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
 mysql -u ${MYSQL_ROOT_USER} --password="${MYSQL_ROOT_PASSWORD}" ${MYSQL_DATABASE} -e "CREATE SCHEMA IF NOT EXISTS short_urls_schema CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
 

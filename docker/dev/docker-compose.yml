@@ -1,24 +1,24 @@
 version: '3.8'
 
 services:
-  core-db:
-    container_name: mysql_core_db_dev
+  core-db-main:
+    container_name: mysql_core_main_db_dev
     build:
       context: .
-      dockerfile: ./docker/dev/image/mysql/Dockerfile
+      dockerfile: ./docker/dev/image/mysql_main/Dockerfile
       args:
-        mysql_root_user: ${MYSQL_ROOT_USER}
-        mysql_root_password: ${MYSQL_ROOT_PASSWORD}
-        mysql_database: ${MYSQL_DATABASE}
-        mysql_user: ${MYSQL_USER}
-        mysql_password: ${MYSQL_PASSWORD}
-        mysql_port: ${MYSQL_PORT}
-        mysql_conn: ${MYSQL_CONN}
+        mysql_root_user: ${MYSQL_ROOT_USER_MAIN}
+        mysql_root_password: ${MYSQL_ROOT_PASSWORD_MAIN}
+        mysql_database: ${MYSQL_DATABASE_MAIN}
+        mysql_user: ${MYSQL_USER_MAIN}
+        mysql_password: ${MYSQL_PASSWORD_MAIN}
+        mysql_port: ${MYSQL_PORT_MAIN}
+        mysql_conn: ${MYSQL_CONN_MAIN}
     restart: unless-stopped
     volumes:
-      - core_data:/var/lib/mysql
+      - core_data_main:/var/lib/mysql
     ports:
-      - ${MYSQL_PORT}:3306
+      - ${MYSQL_PORT_MAIN}:3306
     healthcheck:
       test:
         [
@@ -26,10 +26,48 @@ services:
           'mysqladmin',
           'ping',
           '-h',
-          '${MYSQL_HOST}',
+          '${MYSQL_HOST_MAIN}',
           '-u',
-          '${MYSQL_USER}',
-          '--password=${MYSQL_PASSWORD}',
+          '${MYSQL_USER_MAIN}',
+          '--password=${MYSQL_PASSWORD_MAIN}',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  core-db-worker:
+    container_name: mysql_core_worker_db_dev
+    build:
+      context: .
+      dockerfile: ./docker/dev/image/mysql_worker/Dockerfile
+      args:
+        mysql_root_user: ${MYSQL_ROOT_USER_WORKER}
+        mysql_root_password: ${MYSQL_ROOT_PASSWORD_WORKER}
+        mysql_database: ${MYSQL_DATABASE_WORKER}
+        mysql_user: ${MYSQL_USER_WORKER}
+        mysql_password: ${MYSQL_PASSWORD_WORKER}
+        mysql_port: ${MYSQL_PORT_WORKER}
+        mysql_conn: ${MYSQL_CONN_WORKER}
+    restart: unless-stopped
+    depends_on:
+      core-db-main:
+        condition: service_healthy
+    volumes:
+      - core_data_worker:/var/lib/mysql
+    ports:
+      - ${MYSQL_PORT_WORKER}:3306
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          '${MYSQL_HOST_WORKER}',
+          '-u',
+          '${MYSQL_USER_WORKER}',
+          '--password=${MYSQL_PASSWORD_WORKER}',
         ]
       interval: 30s
       timeout: 10s
@@ -40,16 +78,16 @@ services:
     container_name: phpmyadmin_core_db_debug
     build:
       context: .
-      dockerfile: ./docker/debug/image/phpmyadmin/Dockerfile
+      dockerfile: ./docker/dev/image/phpmyadmin/Dockerfile
       args:
-        mysql_root_password: ${MYSQL_ROOT_PASSWORD}
+        mysql_root_password: ${MYSQL_ROOT_PASSWORD_MAIN}
         phpmyadmin_port: ${PHPMYADMIN_PORT}
-        phpmyadmin_pma_host: core-db
+        phpmyadmin_pma_host: core-db-main
         phpmyadmin_pma_port: 3306
         phpmyadmin_pma_arbitrary: 0
     restart: unless-stopped
     depends_on:
-      core-db:
+      core-db-main:
         condition: service_healthy
     ports:
       - '127.0.0.1:${PHPMYADMIN_PORT}:80'
@@ -97,5 +135,6 @@ services:
         condition: service_healthy
 
 volumes:
-  core_data:
+  core_data_main:
+  core_data_worker:
   cache_data:
