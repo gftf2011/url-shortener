@@ -1,26 +1,42 @@
-export interface IDbConnection {
-  connect: (config: any) => Promise<void>;
+export interface ISingleDbConnection {
+  connect: (masterConfig: any, slaveConfigs: any[]) => Promise<void>;
   disconnect: () => Promise<void>;
   getConnection(): Promise<any>;
+}
+
+export interface IDbConnection {
+  connect: (masterConfig: any, slaveConfigs: any[]) => Promise<void>;
+  disconnect: () => Promise<void>;
+  getMasterConnection(): Promise<any>;
+  getSlaveConnection(): Promise<any>;
 }
 
 export interface ISqlDbQuery {
   query: (queryText: string, values: any[]) => Promise<any>;
 }
 
-export interface ISqlDbLocker {
-  lockReadTable: (table: string) => Promise<void>;
-  lockWriteTable: (table: string) => Promise<void>;
-  unlockTables: () => Promise<void>;
+export interface ISqlDbClient {
+  createClient: () => Promise<void>;
+  close: () => Promise<void>;
 }
 
-export interface ISqlDbTransaction extends ISqlDbQuery, ISqlDbLocker {
+export interface ISqlDbLocker {
+  lockTable: (table: string) => Promise<void>;
+  unlockTable: (table: string) => Promise<void>;
+}
+
+export interface ISqlMasterDbTransaction
+  extends ISqlDbClient,
+    ISqlDbQuery,
+    ISqlDbLocker {
   openTransaction: () => Promise<void>;
   closeTransaction: () => Promise<void>;
-  createClient: () => Promise<void>;
   commit: () => Promise<void>;
   rollback: () => Promise<void>;
-  close: () => Promise<void>;
+}
+
+export interface ISqlSlaveDbTransaction extends ISqlDbClient, ISqlDbQuery {
+  release: () => Promise<void>;
 }
 
 export interface IKeyValueDbCommands {

@@ -5,13 +5,16 @@ import { ISqlDbQuery } from '../../../../common/app/contracts/databases';
 import { IDValueObject } from 'src/short-url/domain/value-objects';
 
 export class MySqlShortUrlRepository implements IShortUrlRepository {
-  constructor(private readonly db: ISqlDbQuery) {}
+  constructor(
+    private readonly readQueryDb: ISqlDbQuery,
+    private readonly writeQueryDb: ISqlDbQuery,
+  ) {}
 
   async findById(shortUrlId: IDValueObject): Promise<ShortUrlEntity> {
     const command = 'SELECT * FROM short_urls_schema.short_urls WHERE id = ?;';
     const values = [shortUrlId.value];
 
-    const [rows] = await (this.db as mysql.PoolConnection).query(
+    const [rows] = await (this.readQueryDb as mysql.PoolConnection).query(
       command,
       values,
     );
@@ -35,7 +38,7 @@ export class MySqlShortUrlRepository implements IShortUrlRepository {
       entity.getValue().createdAt.getTime(),
     ];
 
-    await (this.db as mysql.PoolConnection).query(command, values);
+    await (this.writeQueryDb as mysql.PoolConnection).query(command, values);
   }
 
   async delete(entity: ShortUrlEntity): Promise<void> {
@@ -47,7 +50,7 @@ export class MySqlShortUrlRepository implements IShortUrlRepository {
       entity.getValue().id.value,
     ];
 
-    await (this.db as mysql.PoolConnection).query(command, values);
+    await (this.writeQueryDb as mysql.PoolConnection).query(command, values);
   }
 
   async increaseLastId(entity: ShortUrlEntity): Promise<void> {
@@ -60,7 +63,7 @@ export class MySqlShortUrlRepository implements IShortUrlRepository {
       'UPDATE short_urls_schema.counter SET last_id = ? WHERE table_name = ?;';
     const values = [value, 'short_urls'];
 
-    await (this.db as mysql.PoolConnection).query(command, values);
+    await (this.writeQueryDb as mysql.PoolConnection).query(command, values);
   }
 
   async getLastId(): Promise<string> {
@@ -68,7 +71,7 @@ export class MySqlShortUrlRepository implements IShortUrlRepository {
       'SELECT * FROM short_urls_schema.counter WHERE table_name = ?;';
     const values = ['short_urls'];
 
-    const [rows] = await (this.db as mysql.PoolConnection).query(
+    const [rows] = await (this.readQueryDb as mysql.PoolConnection).query(
       command,
       values,
     );

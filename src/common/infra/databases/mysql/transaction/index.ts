@@ -1,52 +1,95 @@
 import mysql from 'mysql2/promise';
 import {
   IDbConnection,
-  ISqlDbTransaction,
+  ISqlMasterDbTransaction,
+  ISqlSlaveDbTransaction,
 } from '../../../../app/contracts/databases';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+
+const sleep = async (ms: number): Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
 
 @Injectable()
-export class MysqlTransaction implements ISqlDbTransaction {
-  private client: mysql.PoolConnection;
+export class MysqlMasterTransaction implements ISqlMasterDbTransaction {
+  private masterClient: mysql.PoolConnection;
 
-  constructor(
-    @Inject('IDbConnection') private readonly connection: IDbConnection,
-  ) {}
+  constructor(private readonly connection: IDbConnection) {}
 
   public async createClient(): Promise<void> {
-    this.client = await this.connection.getConnection();
+    this.masterClient = await this.connection.getMasterConnection();
   }
 
   public async openTransaction(): Promise<void> {
-    await this.client.beginTransaction();
+    await this.masterClient.beginTransaction();
   }
 
   public async query(queryText: string, values: any[]): Promise<any> {
-    return this.client.query(queryText, values);
+    return this.masterClient.query(queryText, values);
   }
 
-  public async lockReadTable(table: string): Promise<void> {
-    await this.client.query(`LOCK TABLES ${table} READ;`);
+  public async lockTable(table: string): Promise<void> {
+    const conn: mysql.PoolConnection =
+      await this.connection.getMasterConnection();
+    let released: boolean = false;
+
+    while (!released) {
+      try {
+        await conn.query(`INSERT INTO locks_schema.locks (name) VALUES (?);`, [
+          table,
+        ]);
+        released = true;
+      } catch (e) {
+        await sleep(100);
+      }
+    }
+    conn.release();
   }
 
-  public async lockWriteTable(table: string): Promise<void> {
-    await this.client.query(`LOCK TABLES ${table} WRITE;`);
-  }
-
-  public async unlockTables(): Promise<void> {
-    await this.client.query('UNLOCK TABLES;');
+  public async unlockTable(table: string): Promise<void> {
+    const conn: mysql.PoolConnection =
+      await this.connection.getMasterConnection();
+    await conn.beginTransaction();
+    await conn.query(`DELETE FROM locks_schema.locks WHERE name = ?;`, [table]);
+    await conn.commit();
+    conn.release();
   }
 
   public async closeTransaction(): Promise<void> {
-    this.client.release();
+    this.masterClient.release();
   }
 
   public async commit(): Promise<void> {
-    await this.client.commit();
+    await this.masterClient.commit();
   }
 
   public async rollback(): Promise<void> {
-    await this.client.rollback();
+    await this.masterClient.rollback();
+  }
+
+  public async close(): Promise<void> {
+    await this.connection.disconnect();
+  }
+}
+
+@Injectable()
+export class MysqlSlaveTransaction implements ISqlSlaveDbTransaction {
+  private slaveClient: mysql.PoolConnection;
+
+  constructor(private readonly connection: IDbConnection) {}
+
+  public async createClient(): Promise<void> {
+    this.slaveClient = await this.connection.getSlaveConnection();
+  }
+
+  public async query(queryText: string, values: any[]): Promise<any> {
+    return this.slaveClient.query(queryText, values);
+  }
+
+  public async release(): Promise<void> {
+    await this.slaveClient.release();
   }
 
   public async close(): Promise<void> {

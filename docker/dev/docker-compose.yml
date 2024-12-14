@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  core-db-main:
+  core_db_main:
     container_name: mysql_core_main_db_dev
     build:
       context: .
@@ -14,6 +14,8 @@ services:
         mysql_password: ${MYSQL_PASSWORD_MAIN}
         mysql_port: ${MYSQL_PORT_MAIN}
         mysql_conn: ${MYSQL_CONN_MAIN}
+        mysql_replication_user: ${MYSQL_REPLICATION_USER}
+        mysql_replication_password: ${MYSQL_REPLICATION_PASSWORD}
     restart: unless-stopped
     volumes:
       - core_data_main:/var/lib/mysql
@@ -36,7 +38,7 @@ services:
       retries: 10
       start_period: 10s
 
-  core-db-worker:
+  core_db_worker:
     container_name: mysql_core_worker_db_dev
     build:
       context: .
@@ -49,9 +51,15 @@ services:
         mysql_password: ${MYSQL_PASSWORD_WORKER}
         mysql_port: ${MYSQL_PORT_WORKER}
         mysql_conn: ${MYSQL_CONN_WORKER}
+        mysql_master_database: ${MYSQL_MASTER_DATABASE}
+        mysql_master_database_host: ${MYSQL_MASTER_DATABASE_HOST}
+        mysql_master_database_user: ${MYSQL_MASTER_DATABASE_USER}
+        mysql_master_database_password: ${MYSQL_MASTER_DATABASE_PASSWORD}
+        mysql_master_replication_user: ${MYSQL_MASTER_REPLICATION_USER}
+        mysql_master_replication_password: ${MYSQL_MASTER_REPLICATION_PASSWORD}
     restart: unless-stopped
     depends_on:
-      core-db-main:
+      core_db_main:
         condition: service_healthy
     volumes:
       - core_data_worker:/var/lib/mysql
@@ -75,19 +83,19 @@ services:
       start_period: 10s
 
   core_db_admin:
-    container_name: phpmyadmin_core_db_debug
+    container_name: phpmyadmin_core_db_dev
     build:
       context: .
       dockerfile: ./docker/dev/image/phpmyadmin/Dockerfile
       args:
         mysql_root_password: ${MYSQL_ROOT_PASSWORD_MAIN}
         phpmyadmin_port: ${PHPMYADMIN_PORT}
-        phpmyadmin_pma_host: core-db-main
+        phpmyadmin_pma_hosts: core_db_main,core_db_worker
         phpmyadmin_pma_port: 3306
         phpmyadmin_pma_arbitrary: 0
     restart: unless-stopped
     depends_on:
-      core-db-main:
+      core_db_main:
         condition: service_healthy
     ports:
       - '127.0.0.1:${PHPMYADMIN_PORT}:80'

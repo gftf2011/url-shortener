@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import { createPool, Pool } from 'generic-pool';
-import { IDbConnection } from '../../../../app/contracts/databases';
+import { ISingleDbConnection } from '../../../../app/contracts/databases';
 import { Injectable } from '@nestjs/common';
 
 type Config = {
@@ -13,7 +13,7 @@ type Config = {
 };
 
 @Injectable()
-export class RedisDBConnection implements IDbConnection {
+export class RedisDBConnection implements ISingleDbConnection {
   private static pool: Pool<Redis>;
 
   private static instance: RedisDBConnection;

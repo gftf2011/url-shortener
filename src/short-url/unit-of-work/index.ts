@@ -1,59 +1,65 @@
-import { ISqlDbTransaction } from '../../common/app/contracts/databases';
+import {
+  ISqlMasterDbTransaction,
+  ISqlSlaveDbTransaction,
+} from '../../common/app/contracts/databases';
 import { IShortUrlService } from '../contracts/services';
 
 export class UnitOfWorkDecorator implements IShortUrlService {
   constructor(
     private readonly decoratee: IShortUrlService,
-    private readonly transaction: ISqlDbTransaction,
+    private readonly masterTransaction: ISqlMasterDbTransaction,
+    private readonly slaveTransaction: ISqlSlaveDbTransaction,
   ) {}
 
   public async create(longUrl: string, clientId: string): Promise<string> {
     try {
-      await this.transaction.createClient();
-      await this.transaction.openTransaction();
+      await this.slaveTransaction.createClient();
+      await this.masterTransaction.createClient();
+      await this.masterTransaction.openTransaction();
 
       const result = await this.decoratee.create(longUrl, clientId);
 
-      await this.transaction.commit();
-      await this.transaction.closeTransaction();
+      await this.slaveTransaction.release();
+      await this.masterTransaction.commit();
+      await this.masterTransaction.closeTransaction();
 
       return result;
     } catch (e) {
-      await this.transaction.rollback();
-      await this.transaction.closeTransaction();
+      await this.slaveTransaction.release();
+      await this.masterTransaction.rollback();
+      await this.masterTransaction.closeTransaction();
       throw e;
     }
   }
 
   public async get(shortUrlId: string): Promise<string> {
     try {
-      await this.transaction.createClient();
-      await this.transaction.openTransaction();
-
+      await this.slaveTransaction.createClient();
       const result = await this.decoratee.get(shortUrlId);
-
-      await this.transaction.commit();
-      await this.transaction.closeTransaction();
+      await this.slaveTransaction.release();
 
       return result;
     } catch (e) {
-      await this.transaction.unlockTables();
-      await this.transaction.rollback();
-      await this.transaction.closeTransaction();
+      await this.slaveTransaction.release();
       throw e;
     }
   }
 
   public async delete(clientId: string, shortUrlId: string): Promise<void> {
     try {
-      await this.transaction.createClient();
-      await this.transaction.openTransaction();
+      await this.slaveTransaction.createClient();
+      await this.masterTransaction.createClient();
+      await this.masterTransaction.openTransaction();
+
       await this.decoratee.delete(clientId, shortUrlId);
-      await this.transaction.commit();
-      await this.transaction.closeTransaction();
+
+      await this.slaveTransaction.release();
+      await this.masterTransaction.commit();
+      await this.masterTransaction.closeTransaction();
     } catch (e) {
-      await this.transaction.rollback();
-      await this.transaction.closeTransaction();
+      await this.slaveTransaction.release();
+      await this.masterTransaction.rollback();
+      await this.masterTransaction.closeTransaction();
       throw e;
     }
   }

@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import {
-  IDbConnection,
+  ISingleDbConnection,
   IKeyValueDbTransaction,
 } from '../../../../app/contracts/databases';
 import { Inject, Injectable } from '@nestjs/common';
@@ -13,7 +13,8 @@ export class RedisTransaction implements IKeyValueDbTransaction {
   private client: Redis;
 
   constructor(
-    @Inject('IDbConnection') private readonly connection: IDbConnection,
+    @Inject('ISingleDbConnection')
+    private readonly connection: ISingleDbConnection,
   ) {}
 
   public async createClient(): Promise<void> {

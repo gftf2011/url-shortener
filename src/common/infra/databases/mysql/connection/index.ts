@@ -15,7 +15,7 @@ type Config = {
 
 @Injectable()
 export class MysqlDBConnection implements IDbConnection {
-  private static pool: mysql.Pool;
+  private static poolCluster: mysql.PoolCluster;
 
   private static instance: MysqlDBConnection;
 
@@ -28,17 +28,35 @@ export class MysqlDBConnection implements IDbConnection {
     return this.instance;
   }
 
-  public async connect(config: Config): Promise<void> {
-    if (!MysqlDBConnection.pool) {
-      const pool = mysql.createPool({
-        port: config.port,
-        host: config.host,
-        user: config.user,
-        database: config.database,
-        password: config.password,
+  public async connect(
+    masterConfig: Config,
+    slaveConfigs: Config[],
+  ): Promise<void> {
+    if (!MysqlDBConnection.poolCluster) {
+      const poolCluster = mysql.createPoolCluster();
+
+      poolCluster.add('MASTER', {
+        port: masterConfig.port,
+        host: masterConfig.host,
+        user: masterConfig.user,
+        database: masterConfig.database,
+        password: masterConfig.password,
         waitForConnections: true,
-        connectionLimit: config.connectionLimit,
+        connectionLimit: masterConfig.connectionLimit,
         enableKeepAlive: false,
+      });
+
+      slaveConfigs.forEach((config: Config, index: number) => {
+        poolCluster.add(`REPLICA${index}`, {
+          port: config.port,
+          host: config.host,
+          user: config.user,
+          database: config.database,
+          password: config.password,
+          waitForConnections: true,
+          connectionLimit: config.connectionLimit,
+          enableKeepAlive: false,
+        });
       });
 
       let connection: mysql.PoolConnection = null;
@@ -56,7 +74,7 @@ export class MysqlDBConnection implements IDbConnection {
       while (!connection) {
         try {
           await sleep(1000);
-          connection = await pool.getConnection();
+          connection = await poolCluster.getConnection('MASTER');
         } catch (err) {
           connection = null;
         }
@@ -64,15 +82,19 @@ export class MysqlDBConnection implements IDbConnection {
 
       connection.release();
 
-      MysqlDBConnection.pool = pool;
+      MysqlDBConnection.poolCluster = poolCluster;
     }
   }
 
   public async disconnect(): Promise<void> {
-    await MysqlDBConnection.pool.end();
+    await MysqlDBConnection.poolCluster.end();
   }
 
-  public async getConnection(): Promise<mysql.PoolConnection> {
-    return MysqlDBConnection.pool.getConnection();
+  public async getMasterConnection(): Promise<mysql.PoolConnection> {
+    return MysqlDBConnection.poolCluster.getConnection('MASTER');
+  }
+
+  public async getSlaveConnection(): Promise<mysql.PoolConnection> {
+    return MysqlDBConnection.poolCluster.getConnection('REPLICA*');
   }
 }
