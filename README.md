@@ -32,6 +32,12 @@
 
 This a backend APP from a URL-SHORTENER Nest.JS typescript project.
 
+It is a study project used to see how would be implemented a incremental version of a URL-SHORTENER.
+The best approach for this problem it is not this one presented, again it is just a study repo !
+
+To see an implementation using the incremental version see the branch "incremental-short-url"
+To see an implementation using the incremental version, with sync data replication, see the branch "branch", W.I.P. (Work In Progress)
+
 The objective from this project was to explore the framework by creating a well defined set of APIs with a decoupled architecture using Clean Architecture and D.D.D. - (Domain Driven Design) and exploring architecture capabilities like caching and design capabilities with several design patterns.
 
 <br/>
